@@ -1,18 +1,45 @@
 package io.paperdb;
 
-import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
-
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-@DefaultSerializer(CompatibleFieldSerializer.class)
-public class Person implements Serializable {
-    public String mName;
-    public int mAge;
-    public List<String> mPhoneNumbers;
-    public String[] mBikes;
+public class Person {
+    private String mName;
+    private int mAge;
+    private List<String> mPhoneNumbers;
+    private String[] mBikes;
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
+    }
+
+    public int getAge() {
+        return mAge;
+    }
+
+    public void setAge(int age) {
+        mAge = age;
+    }
+
+    public List<String> getPhoneNumbers() {
+        return mPhoneNumbers;
+    }
+
+    public void setPhoneNumbers(List<String> phoneNumbers) {
+        mPhoneNumbers = phoneNumbers;
+    }
+
+    public String[] getBikes() {
+        return mBikes;
+    }
+
+    public void setBikes(String[] bikes) {
+        mBikes = bikes;
+    }
 
     @Override
     public boolean equals(Object o) {

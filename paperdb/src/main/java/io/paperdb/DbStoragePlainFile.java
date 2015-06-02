@@ -13,7 +13,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,13 +44,13 @@ public class DbStoragePlainFile extends DbStorageBase {
     }
 
     @Override
-    public synchronized <E extends Serializable> void insert(String tableName, Collection<E> items) {
+    public synchronized <E> void insert(String tableName, Collection<E> items) {
         if (items == null || items.size() == 0) {
             deleteIfExists(tableName);
             return;
         }
         //noinspection unchecked
-        E[] copy = (E[]) Array.newInstance(Serializable.class, items.size());
+        E[] copy = (E[]) Array.newInstance(Object.class, items.size());
         copy = items.toArray(copy);
         final PaperTable<E> paperTable = new PaperTable<>(copy);
 
@@ -107,7 +106,7 @@ public class DbStoragePlainFile extends DbStorageBase {
     }
 
     @Override
-    public synchronized <E extends Serializable> List<E> select(String tableName) {
+    public synchronized <E> List<E> select(String tableName) {
         List<E> items = new ArrayList<>();
 
         final File originalFile = makeOriginalFile(tableName);

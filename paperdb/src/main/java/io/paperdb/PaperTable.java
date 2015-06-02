@@ -1,12 +1,6 @@
 package io.paperdb;
 
-import com.esotericsoftware.kryo.DefaultSerializer;
-import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
-
-import java.io.Serializable;
-
-@DefaultSerializer(CompatibleFieldSerializer.class)
-class PaperTable<T> implements Serializable {
+class PaperTable<T> {
 
     @SuppressWarnings("UnusedDeclaration") PaperTable() {
     }

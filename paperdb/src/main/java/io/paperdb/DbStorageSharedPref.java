@@ -9,7 +9,6 @@ import com.esotericsoftware.kryo.io.Output;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,14 +36,14 @@ public class DbStorageSharedPref extends DbStorageBase {
     }
 
     @Override
-    public <E extends Serializable> void insert(String tableName, Collection<E> items) {
+    public <E> void insert(String tableName, Collection<E> items) {
         if (items == null || items.size() == 0) {
             deleteIfExists(tableName);
             return;
         }
         final Kryo kryo = getKryo();
         //noinspection unchecked
-        E[] copy = (E[]) Array.newInstance(Serializable.class, items.size());
+        E[] copy = (E[]) Array.newInstance(Object.class, items.size());
         copy = items.toArray(copy);
         final PaperTable<E> paperTable = new PaperTable<>(copy);
         ByteArrayOutputStream bos = new ByteArrayOutputStream(items.size() * 10);
@@ -61,7 +60,7 @@ public class DbStorageSharedPref extends DbStorageBase {
     }
 
     @Override
-    public <E extends Serializable> List<E> select(String tableName) {
+    public <E> List<E> select(String tableName) {
         List<E> items = new ArrayList<>();
         final Kryo kryo = getKryo();
         String tableHex = prefDb.getString(tableName, null);

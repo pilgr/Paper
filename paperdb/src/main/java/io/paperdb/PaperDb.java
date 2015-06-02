@@ -2,7 +2,6 @@ package io.paperdb;
 
 import android.content.Context;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,11 +33,11 @@ public class PaperDb {
         return new DbStoragePlainFile(context, dbName);
     }
 
-    public <E extends Serializable> void insert(String tableName, Collection<E> items) {
+    public <T> void insert(String tableName, Collection<T> items) {
         mStorage.insert(tableName, items);
     }
 
-    public <E extends Serializable> List<E> select(String tableName) {
+    public <T> List<T> select(String tableName) {
         return mStorage.select(tableName);
     }
 
