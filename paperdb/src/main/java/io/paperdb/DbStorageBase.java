@@ -1,7 +1,5 @@
 package io.paperdb;
 
-import android.content.Context;
-
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.serializers.VersionFieldSerializer;
 
@@ -23,7 +21,7 @@ public abstract class DbStorageBase {
         }
     };
 
-    public abstract void destroy(Context context, String dbName);
+    public abstract void destroy();
 
     public abstract <E> void insert(String tableName, Collection<E> items);
 

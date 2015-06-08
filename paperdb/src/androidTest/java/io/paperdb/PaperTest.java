@@ -13,113 +13,110 @@ import java.util.concurrent.Future;
 
 import util.TestDataGenerator;
 
-public class PaperDbTest extends AndroidTestCase {
-    private static final String TAG = "PaperDbTest";
-
-    private static final String TEST_DB = "test-db";
-    private PaperDb mPaperDb;
+public class PaperTest extends AndroidTestCase {
+    private static final String TAG = "PaperTest";
 
     public void setUp() throws Exception {
         super.setUp();
-        PaperDb.destroy(getContext(), TEST_DB);
-        mPaperDb = new PaperDb(getContext(), TEST_DB);
+        Paper.destroy(getContext());
+        Paper.init(getContext());
     }
 
     public void testInsert0() throws Exception {
         final List<Person> inserted = TestDataGenerator.genPersonList(0);
-        mPaperDb.insert("persons", inserted);
+        Paper.insert("persons", inserted);
 
-        PaperDb newDbInstance = new PaperDb(getContext(), TEST_DB);
-        final List<Person> selected = newDbInstance.select("persons");
+        Paper.init(getContext()); //Use new Paper instance
+        final List<Person> selected = Paper.select("persons");
         assertEquals(0, selected.size());
     }
 
     public void testInsertNull() throws Exception {
         final List<Person> inserted = TestDataGenerator.genPersonList(10);
-        mPaperDb.insert("persons", inserted);
-        PaperDb newDbInstance = new PaperDb(getContext(), TEST_DB);
-        final List<Person> selected = newDbInstance.select("persons");
+        Paper.insert("persons", inserted);
+        Paper.init(getContext());
+        final List<Person> selected = Paper.select("persons");
         assertEquals(inserted, selected);
 
-        mPaperDb.insert("persons", null);
-        List<Person> selectedNull = newDbInstance.select("persons");
+        Paper.insert("persons", null);
+        List<Person> selectedNull = Paper.select("persons");
         assertEquals(0, selectedNull.size());
     }
 
     public void testInsert1() throws Exception {
         final List<Person> inserted = TestDataGenerator.genPersonList(1);
-        mPaperDb.insert("persons", inserted);
+        Paper.insert("persons", inserted);
 
-        PaperDb newDbInstance = new PaperDb(getContext(), TEST_DB);
-        final List<Person> selected = newDbInstance.select("persons");
+        Paper.init(getContext());
+        final List<Person> selected = Paper.select("persons");
 
         assertEquals(inserted, selected);
     }
 
     public void testInsert10() {
         final List<Person> inserted = TestDataGenerator.genPersonList(10);
-        mPaperDb.insert("persons", inserted);
+        Paper.insert("persons", inserted);
 
-        PaperDb newDbInstance = new PaperDb(getContext(), TEST_DB);
-        final List<Person> selected = newDbInstance.select("persons");
+        Paper.init(getContext());
+        final List<Person> selected = Paper.select("persons");
 
         assertEquals(inserted, selected);
     }
 
     public void testReplace() {
         final List<Person> inserted10 = TestDataGenerator.genPersonList(10);
-        mPaperDb.insert("persons", inserted10);
-        mPaperDb = new PaperDb(getContext(), TEST_DB);
-        final List<Person> selected10 = mPaperDb.select("persons");
+        Paper.insert("persons", inserted10);
+        Paper.init(getContext());
+        final List<Person> selected10 = Paper.select("persons");
         assertEquals(inserted10, selected10);
 
         final List<Person> replace1 = TestDataGenerator.genPersonList(1);
-        mPaperDb.insert("persons", replace1);
-        mPaperDb = new PaperDb(getContext(), TEST_DB);
-        List<Person> selected1 = mPaperDb.select("persons");
+        Paper.insert("persons", replace1);
+        Paper.init(getContext());
+        List<Person> selected1 = Paper.select("persons");
         assertEquals(replace1, selected1);
     }
 
     public void testSelect() {
         //Select from not existed
-        final List<Person> selected = mPaperDb.select("persons");
+        final List<Person> selected = Paper.select("persons");
         assertEquals(0, selected.size());
 
         //Select from existed
         final List<Person> inserted100 = TestDataGenerator.genPersonList(100);
-        mPaperDb.insert("persons", inserted100);
-        final List<Person> selected100 = mPaperDb.select("persons");
+        Paper.insert("persons", inserted100);
+        final List<Person> selected100 = Paper.select("persons");
         assertEquals(inserted100, selected100);
     }
 
     public void testExist() throws Exception {
-        assertFalse(mPaperDb.exist("persons"));
-        mPaperDb.insert("persons", TestDataGenerator.genPersonList(10));
-        assertTrue(mPaperDb.exist("persons"));
+        assertFalse(Paper.exist("persons"));
+        Paper.insert("persons", TestDataGenerator.genPersonList(10));
+        assertTrue(Paper.exist("persons"));
     }
 
     public void testDelete() throws Exception {
-        mPaperDb.insert("persons", TestDataGenerator.genPersonList(10));
-        assertTrue(mPaperDb.exist("persons"));
-        mPaperDb.delete("persons");
-        assertFalse(mPaperDb.exist("persons"));
+        Paper.insert("persons", TestDataGenerator.genPersonList(10));
+        assertTrue(Paper.exist("persons"));
+        Paper.delete("persons");
+        assertFalse(Paper.exist("persons"));
     }
 
     public void testDeleteNotExisted() throws Exception {
-        assertFalse(mPaperDb.exist("persons"));
-        mPaperDb.delete("persons");
+        assertFalse(Paper.exist("persons"));
+        Paper.delete("persons");
     }
 
     public void testDestroy() throws Exception {
-        mPaperDb.insert("persons", TestDataGenerator.genPersonList(10));
-        mPaperDb.insert("persons2", TestDataGenerator.genPersonList(20));
-        assertTrue(mPaperDb.exist("persons"));
-        assertTrue(mPaperDb.exist("persons2"));
+        Paper.insert("persons", TestDataGenerator.genPersonList(10));
+        Paper.insert("persons2", TestDataGenerator.genPersonList(20));
+        assertTrue(Paper.exist("persons"));
+        assertTrue(Paper.exist("persons2"));
 
-        PaperDb.destroy(getContext(), TEST_DB);
-        mPaperDb = new PaperDb(getContext(), TEST_DB);
-        assertFalse(mPaperDb.exist("persons"));
-        assertFalse(mPaperDb.exist("persons2"));
+        Paper.destroy(getContext());
+        Paper.init(getContext());
+        assertFalse(Paper.exist("persons"));
+        assertFalse(Paper.exist("persons2"));
     }
 
     public void testMultiThreadAccess() throws Exception {
@@ -146,7 +143,7 @@ public class PaperDbTest extends AndroidTestCase {
             @Override public void run() {
                 int size = new Random().nextInt(200);
                 final List<Person> inserted100 = TestDataGenerator.genPersonList(size);
-                mPaperDb.insert("persons", inserted100);
+                Paper.insert("persons", inserted100);
                 Log.d(TAG, "Inserted " + size);
             }
         };
@@ -155,7 +152,7 @@ public class PaperDbTest extends AndroidTestCase {
     private Runnable getSelectRunnable() {
         return new Runnable() {
             @Override public void run() {
-                List<Person> selected = mPaperDb.select("persons");
+                List<Person> selected = Paper.select("persons");
                 Log.d(TAG, "Selected " + selected.size());
             }
         };

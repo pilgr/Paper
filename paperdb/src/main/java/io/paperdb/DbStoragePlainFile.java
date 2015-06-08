@@ -19,27 +19,31 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static io.paperdb.PaperDb.TAG;
+import static io.paperdb.Paper.TAG;
 
 public class DbStoragePlainFile extends DbStorageBase {
 
+    private final Context mContext;
+    private final String mDbName;
     private final String mFilesDir;
 
     public DbStoragePlainFile(Context context, String dbName) {
+        mContext = context;
+        mDbName = dbName;
         mFilesDir = getDbPath(context, dbName);
         if (!new File(mFilesDir).exists()) {
             boolean isReady = new File(mFilesDir).mkdirs();
             if (!isReady) {
-                throw new RuntimeException("Couldn't create PaperDb dir: " + mFilesDir);
+                throw new RuntimeException("Couldn't create Paper dir: " + mFilesDir);
             }
         }
     }
 
     @Override
-    public void destroy(Context context, String dbName) {
-        final String dbPath = getDbPath(context, dbName);
+    public void destroy() {
+        final String dbPath = getDbPath(mContext, mDbName);
         if (!deleteDirectory(dbPath)) {
-            Log.e(TAG, "Couldn't delete PaperDb dir " + dbPath);
+            Log.e(TAG, "Couldn't delete Paper dir " + dbPath);
         }
     }
 

@@ -6,27 +6,30 @@ import com.orhanobut.hawk.Hawk;
 
 import java.util.List;
 
-import io.paperdb.PaperDb;
+import io.paperdb.Paper;
 import io.paperdb.Person;
 import util.DelayMeasurer;
 import util.TestDataGenerator;
 
 // z3c
-//        06-05 21:47:05.199    1673-1692/io.paperdb.test D/DelayMeasurer﹕ PaperDb read/writes/10 102ms
+//        06-05 21:47:05.199    1673-1692/io.paperdb.test D/DelayMeasurer﹕ Paper read/writes/10 102ms
 //        06-05 21:47:06.856    1673-1692/io.paperdb.test D/DelayMeasurer﹕ Hawk read/writes/10 165ms
+//Genymotion lollipop 100
+//        06-08 14:24:18.627    3080-3100/io.paperdb.test D/DelayMeasurer﹕ Paper read/writes/100 18ms
+//        06-08 14:24:21.880    3080-3100/io.paperdb.test D/DelayMeasurer﹕ Hawk read/writes/100 32ms
 
 
-public class BenchmarkTest extends AndroidTestCase{
+public class Benchmark extends AndroidTestCase{
 
     public static final String BENCHMARK_DATA = "benchmark-data";
-    private static int REPEAT_COUNT = 10;
+    private static int REPEAT_COUNT = 100;
 
     public void testReadWrite100Items() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(500);
 
-        DelayMeasurer.start("PaperDb read/writes");
+        DelayMeasurer.start("Paper read/writes");
         paperDbReadWrite(contacts, REPEAT_COUNT);
-        DelayMeasurer.finish("PaperDb read/writes", REPEAT_COUNT);
+        DelayMeasurer.finish("Paper read/writes", REPEAT_COUNT);
 
         DelayMeasurer.start("Hawk read/writes");
         hawkReadWrite(contacts, REPEAT_COUNT);
@@ -43,11 +46,11 @@ public class BenchmarkTest extends AndroidTestCase{
     }
 
     private void paperDbReadWrite(List data, int repeat) {
-        PaperDb.destroy(getContext(), "benchmark-db");
-        PaperDb paperDb = new PaperDb(getContext(), "benchmark-db");
+        Paper.destroy(getContext());
+        Paper.init(getContext());
         for (int i = 0; i < repeat; i++) {
-            paperDb.insert(BENCHMARK_DATA, data);
-            paperDb.select(BENCHMARK_DATA);
+            Paper.insert(BENCHMARK_DATA, data);
+            Paper.select(BENCHMARK_DATA);
         }
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import util.DelayMeasurer;
 import util.TestDataGenerator;
 
-public class PaperDbSpeedTest extends AndroidTestCase {
+public class PaperSpeedTest extends AndroidTestCase {
     //Latest results
     //Nexus 5
 //    09-04 23:59:08.262  19291-19333/name.pilgr.appdialer D/AppDialer﹕ [DelayMeasurer:checkTime:42]: testReadList 197ms
@@ -40,28 +40,26 @@ public class PaperDbSpeedTest extends AndroidTestCase {
 
     private static final int LIST_SIZE = 1000;
 
-    private static final String TEST_DB = "test-db";
     private static final String TEST_TABLE = "test-table";
-    private PaperDb mPaperDb;
 
     public void setUp() throws Exception {
-        PaperDb.destroy(getContext(), TEST_DB);
-        mPaperDb = new PaperDb(getContext(), TEST_DB);
+        Paper.destroy(getContext());
+        Paper.init(getContext());
     }
 
     public void testSaveList() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(LIST_SIZE);
         DelayMeasurer.start("testSaveList");
-        mPaperDb.insert(TEST_TABLE, contacts);
+        Paper.insert(TEST_TABLE, contacts);
         DelayMeasurer.finish("testSaveList");
     }
 
     public void testReadList() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(LIST_SIZE);
-        mPaperDb.insert(TEST_TABLE, contacts);
+        Paper.insert(TEST_TABLE, contacts);
 
         DelayMeasurer.start("testReadList");
-        final List<Person> readContacts = mPaperDb.select(TEST_TABLE);
+        final List<Person> readContacts = Paper.select(TEST_TABLE);
         DelayMeasurer.finish("testReadList");
         assertEquals(contacts.size(), readContacts.size());
     }
@@ -72,8 +70,8 @@ public class PaperDbSpeedTest extends AndroidTestCase {
         List<Person> readContacts = null;
         DelayMeasurer.start("testReadWrite100Times");
         for (int i = 0; i < repeat; i++) {
-            mPaperDb.insert(TEST_TABLE, contacts);
-            readContacts = mPaperDb.select(TEST_TABLE);
+            Paper.insert(TEST_TABLE, contacts);
+            readContacts = Paper.select(TEST_TABLE);
         }
         assertEquals(contacts.size(), readContacts.size());
         DelayMeasurer.finish("testReadWrite100Times", repeat);

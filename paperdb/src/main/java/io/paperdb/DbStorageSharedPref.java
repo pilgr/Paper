@@ -19,9 +19,13 @@ import java.util.List;
 public class DbStorageSharedPref extends DbStorageBase {
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
     private final SharedPreferences prefDb;
+    private final Context mContext;
+    private final String mDbName;
 
 
     public DbStorageSharedPref(Context context, String dbName) {
+        mContext = context;
+        mDbName = dbName;
         prefDb = createSharedPrefDbInstance(context, dbName);
     }
 
@@ -30,8 +34,8 @@ public class DbStorageSharedPref extends DbStorageBase {
     }
 
     @Override
-    public void destroy(Context context, String dbName) {
-        SharedPreferences db = createSharedPrefDbInstance(context, dbName);
+    public void destroy() {
+        SharedPreferences db = createSharedPrefDbInstance(mContext, mDbName);
         db.edit().clear().apply();
     }
 
