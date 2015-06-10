@@ -13,11 +13,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 import static io.paperdb.Paper.TAG;
 
@@ -48,17 +43,10 @@ public class DbStoragePlainFile extends DbStorageBase {
     }
 
     @Override
-    public synchronized <E> void insert(String tableName, Collection<E> items) {
-        if (items == null || items.size() == 0) {
-            deleteIfExists(tableName);
-            return;
-        }
-        //noinspection unchecked
-        E[] copy = (E[]) Array.newInstance(Object.class, items.size());
-        copy = items.toArray(copy);
-        final PaperTable<E> paperTable = new PaperTable<>(copy);
+    public synchronized <E> void insert(String key, E value) {
+        final PaperTable<E> paperTable = new PaperTable<>(value);
 
-        final File originalFile = makeOriginalFile(tableName);
+        final File originalFile = getOriginalFile(key);
         final File backupFile = makeBackupFile(originalFile);
         // Rename the current file so it may be used as a backup during the next read
         if (originalFile.exists()) {
@@ -98,22 +86,20 @@ public class DbStoragePlainFile extends DbStorageBase {
                     throw new PaperDbException("Couldn't clean up partially-written file " + originalFile, e);
                 }
             }
-            throw new PaperDbException("Couldn't save table: " + tableName + ". " +
+            throw new PaperDbException("Couldn't save table: " + key + ". " +
                     "Backed up table will be used on next read attempt", e);
         }
     }
 
-    private File makeOriginalFile(String tableName) {
+    private File getOriginalFile(String key) {
         //TODO check valid file name/path with regexp
-        final String tablePath = mFilesDir + File.separator + tableName + ".pt";
+        final String tablePath = mFilesDir + File.separator + key + ".pt";
         return new File(tablePath);
     }
 
     @Override
-    public synchronized <E> List<E> select(String tableName) {
-        List<E> items = new ArrayList<>();
-
-        final File originalFile = makeOriginalFile(tableName);
+    public synchronized <E> E select(String key, E defaultValue) {
+        final File originalFile = getOriginalFile(key);
         final File backupFile = makeBackupFile(originalFile);
         if (backupFile.exists()) {
             //noinspection ResultOfMethodCallIgnored
@@ -122,8 +108,8 @@ public class DbStoragePlainFile extends DbStorageBase {
             backupFile.renameTo(originalFile);
         }
 
-        if (!exist(tableName)) {
-            return items;
+        if (!exist(key)) {
+            return defaultValue;
         }
 
         final Kryo kryo = getKryo();
@@ -132,9 +118,7 @@ public class DbStoragePlainFile extends DbStorageBase {
             //noinspection unchecked
             final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
             i.close();
-            if (paperTable.content != null) {
-                items = new ArrayList<>(Arrays.asList(paperTable.content));
-            }
+            return paperTable.mContent;
         } catch (FileNotFoundException | KryoException e) {
             // Clean up an unsuccessfully written file
             if (originalFile.exists()) {
@@ -142,27 +126,26 @@ public class DbStoragePlainFile extends DbStorageBase {
                     throw new PaperDbException("Couldn't clean up broken/unserializable file " + originalFile, e);
                 }
             }
-            throw new PaperDbException("Couldn't read/deserialize file " + originalFile + " for table " + tableName, e);
+            throw new PaperDbException("Couldn't read/deserialize file " + originalFile + " for table " + key, e);
         }
-        return items;
     }
 
     @Override
-    public synchronized boolean exist(String tableName) {
-        final File originalFile = makeOriginalFile(tableName);
+    public synchronized boolean exist(String key) {
+        final File originalFile = getOriginalFile(key);
         return originalFile.exists();
     }
 
     @Override
-    public synchronized void deleteIfExists(String tableName) {
-        final File originalFile = makeOriginalFile(tableName);
+    public synchronized void deleteIfExists(String key) {
+        final File originalFile = getOriginalFile(key);
         if (!originalFile.exists()) {
             return;
         }
 
         boolean deleted = originalFile.delete();
         if (!deleted) {
-            throw new PaperDbException("Couldn't delete file " + originalFile + " for table " + tableName);
+            throw new PaperDbException("Couldn't delete file " + originalFile + " for table " + key);
         }
     }
 
@@ -170,7 +153,6 @@ public class DbStoragePlainFile extends DbStorageBase {
         return context.getFilesDir() + File.separator + dbName;
     }
 
-    //TODO Improve
     private static boolean deleteDirectory(String dirPath) {
         File directory = new File(dirPath);
         if (directory.exists()) {

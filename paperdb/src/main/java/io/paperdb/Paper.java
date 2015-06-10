@@ -3,7 +3,9 @@ package io.paperdb;
 import android.content.Context;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class Paper {
     static final String TAG = "paperdb";
@@ -22,12 +24,30 @@ public class Paper {
         new Paper(context).mStorageHolder.get().destroy();
     }
 
-    public static <T> void insert(String tableName, Collection<T> items) {
-        INSTANCE.mStorageHolder.get().insert(tableName, items);
+    public static <T> void putList(String key, List<T> list) {
+        putCollection(key, list);
     }
 
-    public static <T> List<T> select(String tableName) {
-        return INSTANCE.mStorageHolder.get().select(tableName);
+    //TODO tests
+    public static <T> void putSet(String key, Set<T> set) {
+        putCollection(key, set);
+    }
+
+    public static <T> List<T> getList(String key) {
+        List<T> list = INSTANCE.mStorageHolder.get().select(key, null);
+        if (list == null) {
+            list = Collections.emptyList();
+        }
+        return list;
+    }
+
+    //TODO tests
+    public static <T> Set<T> getSet(String key) {
+        Set<T> set = INSTANCE.mStorageHolder.get().select(key, null);
+        if (set == null) {
+            set = Collections.emptySet();
+        }
+        return set;
     }
 
     public static boolean exist(String tableName) {
@@ -44,6 +64,14 @@ public class Paper {
 
     private Paper(Context context, String dbName) {
         mStorageHolder = new DbStorageHolder(context.getApplicationContext(), dbName);
+    }
+
+    private static <T> void putCollection(String key, Collection<T> items) {
+        if (items == null || items.size() == 0) {
+            INSTANCE.mStorageHolder.get().deleteIfExists(key);
+            return;
+        }
+        INSTANCE.mStorageHolder.get().insert(key, items);
     }
 
     /**

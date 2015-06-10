@@ -1,9 +1,11 @@
-package io.paperdb;
+package io.paperdb.benchmark;
 
 import android.test.AndroidTestCase;
 
 import java.util.List;
 
+import io.paperdb.Paper;
+import io.paperdb.Person;
 import util.DelayMeasurer;
 import util.TestDataGenerator;
 
@@ -50,16 +52,16 @@ public class PaperSpeedTest extends AndroidTestCase {
     public void testSaveList() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(LIST_SIZE);
         DelayMeasurer.start("testSaveList");
-        Paper.insert(TEST_TABLE, contacts);
+        Paper.putList(TEST_TABLE, contacts);
         DelayMeasurer.finish("testSaveList");
     }
 
     public void testReadList() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(LIST_SIZE);
-        Paper.insert(TEST_TABLE, contacts);
+        Paper.putList(TEST_TABLE, contacts);
 
         DelayMeasurer.start("testReadList");
-        final List<Person> readContacts = Paper.select(TEST_TABLE);
+        final List<Person> readContacts = Paper.getList(TEST_TABLE);
         DelayMeasurer.finish("testReadList");
         assertEquals(contacts.size(), readContacts.size());
     }
@@ -70,8 +72,8 @@ public class PaperSpeedTest extends AndroidTestCase {
         List<Person> readContacts = null;
         DelayMeasurer.start("testReadWrite100Times");
         for (int i = 0; i < repeat; i++) {
-            Paper.insert(TEST_TABLE, contacts);
-            readContacts = Paper.select(TEST_TABLE);
+            Paper.putList(TEST_TABLE, contacts);
+            readContacts = Paper.getList(TEST_TABLE);
         }
         assertEquals(contacts.size(), readContacts.size());
         DelayMeasurer.finish("testReadWrite100Times", repeat);

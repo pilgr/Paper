@@ -5,9 +5,10 @@ class PaperTable<T> {
     @SuppressWarnings("UnusedDeclaration") PaperTable() {
     }
 
-    PaperTable(T[] content) {
-        this.content = content;
+    PaperTable(T content) {
+        this.mContent = content;
     }
 
-    T[] content;
+    // Serialized content
+    T mContent;
 }

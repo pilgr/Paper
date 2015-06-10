@@ -1,4 +1,4 @@
-package benchmark;
+package io.paperdb.benchmark;
 
 import android.test.AndroidTestCase;
 
@@ -49,8 +49,8 @@ public class Benchmark extends AndroidTestCase{
         Paper.destroy(getContext());
         Paper.init(getContext());
         for (int i = 0; i < repeat; i++) {
-            Paper.insert(BENCHMARK_DATA, data);
-            Paper.select(BENCHMARK_DATA);
+            Paper.putList(BENCHMARK_DATA, data);
+            Paper.getList(BENCHMARK_DATA);
         }
     }
 }
