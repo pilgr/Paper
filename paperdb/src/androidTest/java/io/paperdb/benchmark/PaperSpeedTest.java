@@ -5,9 +5,9 @@ import android.test.AndroidTestCase;
 import java.util.List;
 
 import io.paperdb.Paper;
-import io.paperdb.Person;
+import io.paperdb.testdata.Person;
+import io.paperdb.testdata.TestDataGenerator;
 import util.DelayMeasurer;
-import util.TestDataGenerator;
 
 public class PaperSpeedTest extends AndroidTestCase {
     //Latest results

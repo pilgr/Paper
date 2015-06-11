@@ -7,9 +7,9 @@ import com.orhanobut.hawk.Hawk;
 import java.util.List;
 
 import io.paperdb.Paper;
-import io.paperdb.Person;
+import io.paperdb.testdata.Person;
+import io.paperdb.testdata.TestDataGenerator;
 import util.DelayMeasurer;
-import util.TestDataGenerator;
 
 // z3c
 //        06-05 21:47:05.199    1673-1692/io.paperdb.test D/DelayMeasurer﹕ Paper read/writes/10 102ms

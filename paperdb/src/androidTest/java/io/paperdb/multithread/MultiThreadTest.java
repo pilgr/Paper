@@ -11,8 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import io.paperdb.Paper;
-import io.paperdb.Person;
-import util.TestDataGenerator;
+import io.paperdb.testdata.Person;
+import io.paperdb.testdata.TestDataGenerator;
 
 /**
  * Tests read/write into Paper data from multiple threads

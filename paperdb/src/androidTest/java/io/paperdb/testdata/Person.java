@@ -1,4 +1,4 @@
-package io.paperdb;
+package io.paperdb.testdata;
 
 import java.util.Arrays;
 import java.util.List;

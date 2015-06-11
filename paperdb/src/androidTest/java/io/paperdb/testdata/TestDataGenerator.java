@@ -1,9 +1,9 @@
-package util;
+package io.paperdb.testdata;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import io.paperdb.Person;
+import java.util.Set;
 
 public class TestDataGenerator {
     public static List<Person> genPersonList(int size) {
@@ -20,5 +20,9 @@ public class TestDataGenerator {
             list.add(p);
         }
         return list;
+    }
+
+    public static Set<Person> getPersonSet(int size) {
+        return new HashSet<>(TestDataGenerator.genPersonList(size));
     }
 }
