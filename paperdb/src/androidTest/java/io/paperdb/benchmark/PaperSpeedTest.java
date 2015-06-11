@@ -1,6 +1,11 @@
 package io.paperdb.benchmark;
 
+import android.support.test.runner.AndroidJUnit4;
 import android.test.AndroidTestCase;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.List;
 
@@ -9,6 +14,9 @@ import io.paperdb.testdata.Person;
 import io.paperdb.testdata.TestDataGenerator;
 import util.DelayMeasurer;
 
+import static android.support.test.InstrumentationRegistry.getTargetContext;
+
+@RunWith(AndroidJUnit4.class)
 public class PaperSpeedTest extends AndroidTestCase {
     //Latest results
     //Nexus 5
@@ -44,11 +52,13 @@ public class PaperSpeedTest extends AndroidTestCase {
 
     private static final String TEST_TABLE = "test-table";
 
+    @Before
     public void setUp() throws Exception {
-        Paper.destroy(getContext());
-        Paper.init(getContext());
+        Paper.destroy(getTargetContext());
+        Paper.init(getTargetContext());
     }
 
+    @Test
     public void testSaveList() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(LIST_SIZE);
         DelayMeasurer.start("testSaveList");
@@ -56,6 +66,7 @@ public class PaperSpeedTest extends AndroidTestCase {
         DelayMeasurer.finish("testSaveList");
     }
 
+    @Test
     public void testReadList() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(LIST_SIZE);
         Paper.putList(TEST_TABLE, contacts);
@@ -66,6 +77,7 @@ public class PaperSpeedTest extends AndroidTestCase {
         assertEquals(contacts.size(), readContacts.size());
     }
 
+    @Test
     public void testReadWrite100Times100Items() throws Exception {
         final int repeat = 100;
         final List<Person> contacts = TestDataGenerator.genPersonList(1000);

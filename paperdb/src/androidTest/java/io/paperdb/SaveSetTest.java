@@ -1,56 +1,63 @@
 package io.paperdb;
 
-import android.test.AndroidTestCase;
+import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Set;
 
 import io.paperdb.testdata.Person;
 
+import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static io.paperdb.testdata.TestDataGenerator.getPersonSet;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests save Sets
  */
-public class SaveSetTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class SaveSetTest {
 
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
-        Paper.destroy(getContext());
-        Paper.init(getContext());
+        Paper.destroy(getTargetContext());
+        Paper.init(getTargetContext());
     }
 
+    @Test
     public void testDefaultSet() {
-        assertEquals(0, Paper.getSet("non-existed").size());
+        assertThat(Paper.getSet("non-existed")).isEmpty();
     }
 
+    @Test
     public void testPutSet0() throws Exception {
         final Set<Person> inserted = getPersonSet(0);
         Paper.putSet("persons", inserted);
 
-        Paper.init(getContext()); //Use new Paper instance
-        final Set<Person> selected = Paper.getSet("persons");
-        assertEquals(0, selected.size());
+        Paper.init(getTargetContext()); //Use new Paper instance
+        assertThat(Paper.getSet("persons")).isEmpty();
     }
 
+    @Test
     public void testPutSetNull() throws Exception {
         final Set<Person> inserted = getPersonSet(10);
         Paper.putSet("persons", inserted);
-        Paper.init(getContext());
-        final Set<Person> selected = Paper.getSet("persons");
-        assertEquals(inserted, selected);
+
+        Paper.init(getTargetContext());
+        assertThat(Paper.getSet("persons")).isEqualTo(inserted);
 
         Paper.putSet("persons", null);
-        Set<Person> selectedNull = Paper.getSet("persons");
-        assertEquals(0, selectedNull.size());
+        assertThat(Paper.getSet("persons")).isEmpty();
     }
 
+    @Test
     public void testPutSet10() {
         final Set<Person> inserted = getPersonSet(10);
         Paper.putSet("person set", inserted);
 
-        Paper.init(getContext());
-        final Set<Person> selected = Paper.getSet("person set");
-
-        assertEquals(inserted, selected);
+        Paper.init(getTargetContext());
+        assertThat(Paper.getSet("person set")).isEqualTo(inserted);
     }
 }

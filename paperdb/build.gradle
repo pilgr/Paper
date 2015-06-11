@@ -9,16 +9,29 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.esotericsoftware:kryo:3.0.1'
-    compile 'com.orhanobut:hawk:1.14'
+
+    androidTestCompile 'com.orhanobut:hawk:1.14'
+    androidTestCompile 'com.android.support.test:runner:0.3'
+    androidTestCompile 'com.squareup.assertj:assertj-android:1.0.0'
 }
