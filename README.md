@@ -1,5 +1,5 @@
 # paper
-Fast and simple data storage for Android
+Fast and simple data storage for Android. Currently under development.
 
 License
 -------
