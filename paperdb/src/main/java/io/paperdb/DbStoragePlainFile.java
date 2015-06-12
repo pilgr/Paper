@@ -22,13 +22,13 @@ public class DbStoragePlainFile implements Storage {
     private final Context mContext;
     private final String mDbName;
     private String mFilesDir;
-    private boolean mIsInitialized = false;
+    private boolean mIsInitialized;
 
     protected Kryo getKryo() {
         return mKryo.get();
     }
 
-    private ThreadLocal<Kryo> mKryo = new ThreadLocal<Kryo>() {
+    private final ThreadLocal<Kryo> mKryo = new ThreadLocal<Kryo>() {
         @Override
         protected Kryo initialValue() {
             Kryo kryo = new Kryo();
@@ -80,7 +80,7 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
-    public synchronized <E> E select(String key, E defaultValue) {
+    public synchronized <E> E select(String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -93,7 +93,7 @@ public class DbStoragePlainFile implements Storage {
         }
 
         if (!exist(key)) {
-            return defaultValue;
+            return null;
         }
 
         return readTableFile(key, originalFile);
@@ -224,7 +224,7 @@ public class DbStoragePlainFile implements Storage {
                 }
             }
         }
-        return (directory.delete());
+        return directory.delete();
     }
 
     private File makeBackupFile(File originalFile) {

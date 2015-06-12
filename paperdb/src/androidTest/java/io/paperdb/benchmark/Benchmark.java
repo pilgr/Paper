@@ -58,8 +58,8 @@ public class Benchmark extends AndroidTestCase{
         Paper.destroy(getTargetContext());
         Paper.init(getTargetContext());
         for (int i = 0; i < repeat; i++) {
-            Paper.putList(BENCHMARK_DATA, data);
-            Paper.getList(BENCHMARK_DATA);
+            Paper.put(BENCHMARK_DATA, data);
+            Paper.get(BENCHMARK_DATA);
         }
     }
 }

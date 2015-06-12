@@ -2,12 +2,6 @@ package io.paperdb;
 
 import android.content.Context;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 public class Paper {
     static final String TAG = "paperdb";
 
@@ -25,44 +19,21 @@ public class Paper {
         new Paper(context).mStorage.destroy();
     }
 
-    public static <T> void putList(String key, List<T> list) {
-        putCollection(key, list);
-    }
-
-    public static <T> void putSet(String key, Set<T> set) {
-        putCollection(key, set);
-    }
-
-    public static <K, V> void putMap(String key, Map<K, V> map) {
-        if (map == null || map.size() == 0) {
+    public static <T> void put(String key, T value) {
+        if (value == null) {
             INSTANCE.mStorage.deleteIfExists(key);
             return;
         }
-        INSTANCE.mStorage.insert(key, map);
+        INSTANCE.mStorage.insert(key, value);
     }
 
-    public static <T> List<T> getList(String key) {
-        List<T> list = INSTANCE.mStorage.select(key, null);
-        if (list == null) {
-            list = Collections.emptyList();
-        }
-        return list;
+    public static <T> T get(String key) {
+        return get(key, null);
     }
 
-    public static <T> Set<T> getSet(String key) {
-        Set<T> set = INSTANCE.mStorage.select(key, null);
-        if (set == null) {
-            set = Collections.emptySet();
-        }
-        return set;
-    }
-
-    public static <K, V> Map<K, V> getMap(String key) {
-        Map<K, V> map = INSTANCE.mStorage.select(key, null);
-        if (map == null) {
-            map = Collections.emptyMap();
-        }
-        return map;
+    public static <T> T get(String key, T defaultValue) {
+        T value = INSTANCE.mStorage.select(key);
+        return value == null ? defaultValue : value;
     }
 
     public static boolean exist(String tableName) {
@@ -79,14 +50,6 @@ public class Paper {
 
     private Paper(Context context, String dbName) {
         mStorage = new DbStoragePlainFile(context.getApplicationContext(), dbName);
-    }
-
-    private static <T> void putCollection(String key, Collection<T> items) {
-        if (items == null || items.size() == 0) {
-            INSTANCE.mStorage.deleteIfExists(key);
-            return;
-        }
-        INSTANCE.mStorage.insert(key, items);
     }
 
 }

@@ -13,8 +13,8 @@ public class DelayMeasurer {
 
     private static final String TAG = DelayMeasurer.class.getSimpleName();
 
-    private static Map<String, Long> tStartTimeMap = new HashMap<>();
-    private static Map<String, Long> tLastCheckTimeMap = new HashMap<>();
+    private static final Map<String, Long> tStartTimeMap = new HashMap<>();
+    private static final Map<String, Long> tLastCheckTimeMap = new HashMap<>();
 
     public static void start(String tag) {
         tStartTimeMap.put(tag, System.currentTimeMillis());

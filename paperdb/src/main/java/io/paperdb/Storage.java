@@ -6,7 +6,7 @@ interface Storage {
 
     <E> void insert(String key, E value);
 
-    <E> E select(String key, E defaultValue);
+    <E> E select(String key);
 
     boolean exist(String key);
 
