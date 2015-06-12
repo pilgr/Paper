@@ -15,7 +15,7 @@ import static io.paperdb.testdata.TestDataGenerator.genPersonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests save Lists
+ * Tests save and restore Lists
  */
 @RunWith(AndroidJUnit4.class)
 public class SaveListTest {

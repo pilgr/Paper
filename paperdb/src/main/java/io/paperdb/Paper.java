@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Paper {
@@ -28,9 +29,16 @@ public class Paper {
         putCollection(key, list);
     }
 
-    //TODO tests
     public static <T> void putSet(String key, Set<T> set) {
         putCollection(key, set);
+    }
+
+    public static <K, V> void putMap(String key, Map<K, V> map) {
+        if (map == null || map.size() == 0) {
+            INSTANCE.mStorageHolder.get().deleteIfExists(key);
+            return;
+        }
+        INSTANCE.mStorageHolder.get().insert(key, map);
     }
 
     public static <T> List<T> getList(String key) {
@@ -41,13 +49,20 @@ public class Paper {
         return list;
     }
 
-    //TODO tests
     public static <T> Set<T> getSet(String key) {
         Set<T> set = INSTANCE.mStorageHolder.get().select(key, null);
         if (set == null) {
             set = Collections.emptySet();
         }
         return set;
+    }
+
+    public static <K, V> Map<K, V> getMap(String key) {
+        Map<K, V> map = INSTANCE.mStorageHolder.get().select(key, null);
+        if (map == null) {
+            map = Collections.emptyMap();
+        }
+        return map;
     }
 
     public static boolean exist(String tableName) {

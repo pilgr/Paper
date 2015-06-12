@@ -11,11 +11,11 @@ import java.util.Set;
 import io.paperdb.testdata.Person;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
-import static io.paperdb.testdata.TestDataGenerator.getPersonSet;
+import static io.paperdb.testdata.TestDataGenerator.genPersonSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests save Sets
+ * Tests save and restore Sets
  */
 @RunWith(AndroidJUnit4.class)
 public class SaveSetTest {
@@ -33,7 +33,7 @@ public class SaveSetTest {
 
     @Test
     public void testPutSet0() throws Exception {
-        final Set<Person> inserted = getPersonSet(0);
+        final Set<Person> inserted = genPersonSet(0);
         Paper.putSet("persons", inserted);
 
         Paper.init(getTargetContext()); //Use new Paper instance
@@ -42,7 +42,7 @@ public class SaveSetTest {
 
     @Test
     public void testPutSetNull() throws Exception {
-        final Set<Person> inserted = getPersonSet(10);
+        final Set<Person> inserted = genPersonSet(10);
         Paper.putSet("persons", inserted);
 
         Paper.init(getTargetContext());
@@ -54,7 +54,7 @@ public class SaveSetTest {
 
     @Test
     public void testPutSet10() {
-        final Set<Person> inserted = getPersonSet(10);
+        final Set<Person> inserted = genPersonSet(10);
         Paper.putSet("person set", inserted);
 
         Paper.init(getTargetContext());
