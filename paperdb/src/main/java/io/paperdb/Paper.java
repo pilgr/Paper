@@ -15,14 +15,14 @@ public class Paper {
 
     private static Paper INSTANCE;
 
-    private final DbStorageHolder mStorageHolder;
+    private final Storage mStorage;
 
     public static void init(Context context) {
         INSTANCE = new Paper(context);
     }
 
     public static void destroy(Context context) {
-        new Paper(context).mStorageHolder.get().destroy();
+        new Paper(context).mStorage.destroy();
     }
 
     public static <T> void putList(String key, List<T> list) {
@@ -35,14 +35,14 @@ public class Paper {
 
     public static <K, V> void putMap(String key, Map<K, V> map) {
         if (map == null || map.size() == 0) {
-            INSTANCE.mStorageHolder.get().deleteIfExists(key);
+            INSTANCE.mStorage.deleteIfExists(key);
             return;
         }
-        INSTANCE.mStorageHolder.get().insert(key, map);
+        INSTANCE.mStorage.insert(key, map);
     }
 
     public static <T> List<T> getList(String key) {
-        List<T> list = INSTANCE.mStorageHolder.get().select(key, null);
+        List<T> list = INSTANCE.mStorage.select(key, null);
         if (list == null) {
             list = Collections.emptyList();
         }
@@ -50,7 +50,7 @@ public class Paper {
     }
 
     public static <T> Set<T> getSet(String key) {
-        Set<T> set = INSTANCE.mStorageHolder.get().select(key, null);
+        Set<T> set = INSTANCE.mStorage.select(key, null);
         if (set == null) {
             set = Collections.emptySet();
         }
@@ -58,7 +58,7 @@ public class Paper {
     }
 
     public static <K, V> Map<K, V> getMap(String key) {
-        Map<K, V> map = INSTANCE.mStorageHolder.get().select(key, null);
+        Map<K, V> map = INSTANCE.mStorage.select(key, null);
         if (map == null) {
             map = Collections.emptyMap();
         }
@@ -66,11 +66,11 @@ public class Paper {
     }
 
     public static boolean exist(String tableName) {
-        return INSTANCE.mStorageHolder.get().exist(tableName);
+        return INSTANCE.mStorage.exist(tableName);
     }
 
     public static void delete(String tableName) {
-        INSTANCE.mStorageHolder.get().deleteIfExists(tableName);
+        INSTANCE.mStorage.deleteIfExists(tableName);
     }
 
     private Paper(Context context) {
@@ -78,35 +78,15 @@ public class Paper {
     }
 
     private Paper(Context context, String dbName) {
-        mStorageHolder = new DbStorageHolder(context.getApplicationContext(), dbName);
+        mStorage = new DbStoragePlainFile(context.getApplicationContext(), dbName);
     }
 
     private static <T> void putCollection(String key, Collection<T> items) {
         if (items == null || items.size() == 0) {
-            INSTANCE.mStorageHolder.get().deleteIfExists(key);
+            INSTANCE.mStorage.deleteIfExists(key);
             return;
         }
-        INSTANCE.mStorageHolder.get().insert(key, items);
+        INSTANCE.mStorage.insert(key, items);
     }
 
-    /**
-     * Initializes storage lazily
-     */
-    private static class DbStorageHolder {
-        private DbStorageBase mStorage = null;
-        private final Context mContext;
-        private final String mDbName;
-
-        public DbStorageHolder(Context context, String dbName) {
-            mContext = context;
-            mDbName = dbName;
-        }
-
-        private DbStorageBase get() {
-            if (mStorage == null) {
-                mStorage = new DbStoragePlainFile(mContext, mDbName);
-            }
-            return mStorage;
-        }
-    }
 }

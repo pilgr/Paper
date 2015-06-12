@@ -7,6 +7,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.VersionFieldSerializer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,26 +17,36 @@ import java.io.IOException;
 
 import static io.paperdb.Paper.TAG;
 
-public class DbStoragePlainFile extends DbStorageBase {
+public class DbStoragePlainFile implements Storage {
 
     private final Context mContext;
     private final String mDbName;
-    private final String mFilesDir;
+    private String mFilesDir;
+    private boolean mIsInitialized = false;
+
+    protected Kryo getKryo() {
+        return mKryo.get();
+    }
+
+    private ThreadLocal<Kryo> mKryo = new ThreadLocal<Kryo>() {
+        @Override
+        protected Kryo initialValue() {
+            Kryo kryo = new Kryo();
+            kryo.register(PaperTable.class);
+            kryo.setDefaultSerializer(VersionFieldSerializer.class);
+            return kryo;
+        }
+    };
 
     public DbStoragePlainFile(Context context, String dbName) {
         mContext = context;
         mDbName = dbName;
-        mFilesDir = getDbPath(context, dbName);
-        if (!new File(mFilesDir).exists()) {
-            boolean isReady = new File(mFilesDir).mkdirs();
-            if (!isReady) {
-                throw new RuntimeException("Couldn't create Paper dir: " + mFilesDir);
-            }
-        }
     }
 
     @Override
-    public void destroy() {
+    public synchronized void destroy() {
+        assertInit();
+
         final String dbPath = getDbPath(mContext, mDbName);
         if (!deleteDirectory(dbPath)) {
             Log.e(TAG, "Couldn't delete Paper dir " + dbPath);
@@ -44,6 +55,8 @@ public class DbStoragePlainFile extends DbStorageBase {
 
     @Override
     public synchronized <E> void insert(String key, E value) {
+        assertInit();
+
         final PaperTable<E> paperTable = new PaperTable<>(value);
 
         final File originalFile = getOriginalFile(key);
@@ -63,9 +76,71 @@ public class DbStoragePlainFile extends DbStorageBase {
             }
         }
 
-        // Attempt to write the file, delete the backup and return true as atomically as
-        // possible.  If any exception occurs, delete the new file; next time we will restore
-        // from the backup.
+        writeTableFile(key, paperTable, originalFile, backupFile);
+    }
+
+    @Override
+    public synchronized <E> E select(String key, E defaultValue) {
+        assertInit();
+
+        final File originalFile = getOriginalFile(key);
+        final File backupFile = makeBackupFile(originalFile);
+        if (backupFile.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            originalFile.delete();
+            //noinspection ResultOfMethodCallIgnored
+            backupFile.renameTo(originalFile);
+        }
+
+        if (!exist(key)) {
+            return defaultValue;
+        }
+
+        return readTableFile(key, originalFile);
+    }
+
+    @Override
+    public synchronized boolean exist(String key) {
+        assertInit();
+
+        final File originalFile = getOriginalFile(key);
+        return originalFile.exists();
+    }
+
+    @Override
+    public synchronized void deleteIfExists(String key) {
+        assertInit();
+
+        final File originalFile = getOriginalFile(key);
+        if (!originalFile.exists()) {
+            return;
+        }
+
+        boolean deleted = originalFile.delete();
+        if (!deleted) {
+            throw new PaperDbException("Couldn't delete file " + originalFile
+                    + " for table " + key);
+        }
+    }
+
+    private File getOriginalFile(String key) {
+        //TODO check valid file name/path with regexp
+        final String tablePath = mFilesDir + File.separator + key + ".pt";
+        return new File(tablePath);
+    }
+
+    /**
+     * Attempt to write the file, delete the backup and return true as atomically as
+     * possible.  If any exception occurs, delete the new file; next time we will restore
+     * from the backup.
+     *
+     * @param key          table key
+     * @param paperTable   table instance
+     * @param originalFile file to write new data
+     * @param backupFile   backup file to be used if write is failed
+     */
+    private <E> void writeTableFile(String key, PaperTable<E> paperTable,
+                                    File originalFile, File backupFile) {
         try {
             FileOutputStream fileStream = new FileOutputStream(originalFile);
 
@@ -83,7 +158,8 @@ public class DbStoragePlainFile extends DbStorageBase {
             // Clean up an unsuccessfully written file
             if (originalFile.exists()) {
                 if (!originalFile.delete()) {
-                    throw new PaperDbException("Couldn't clean up partially-written file " + originalFile, e);
+                    throw new PaperDbException("Couldn't clean up partially-written file "
+                            + originalFile, e);
                 }
             }
             throw new PaperDbException("Couldn't save table: " + key + ". " +
@@ -91,30 +167,10 @@ public class DbStoragePlainFile extends DbStorageBase {
         }
     }
 
-    private File getOriginalFile(String key) {
-        //TODO check valid file name/path with regexp
-        final String tablePath = mFilesDir + File.separator + key + ".pt";
-        return new File(tablePath);
-    }
-
-    @Override
-    public synchronized <E> E select(String key, E defaultValue) {
-        final File originalFile = getOriginalFile(key);
-        final File backupFile = makeBackupFile(originalFile);
-        if (backupFile.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            originalFile.delete();
-            //noinspection ResultOfMethodCallIgnored
-            backupFile.renameTo(originalFile);
-        }
-
-        if (!exist(key)) {
-            return defaultValue;
-        }
-
-        final Kryo kryo = getKryo();
+    private <E> E readTableFile(String key, File originalFile) {
         try {
             final Input i = new Input(new FileInputStream(originalFile));
+            final Kryo kryo = getKryo();
             //noinspection unchecked
             final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
             i.close();
@@ -123,34 +179,34 @@ public class DbStoragePlainFile extends DbStorageBase {
             // Clean up an unsuccessfully written file
             if (originalFile.exists()) {
                 if (!originalFile.delete()) {
-                    throw new PaperDbException("Couldn't clean up broken/unserializable file " + originalFile, e);
+                    throw new PaperDbException("Couldn't clean up broken/unserializable file "
+                            + originalFile, e);
                 }
             }
-            throw new PaperDbException("Couldn't read/deserialize file " + originalFile + " for table " + key, e);
-        }
-    }
-
-    @Override
-    public synchronized boolean exist(String key) {
-        final File originalFile = getOriginalFile(key);
-        return originalFile.exists();
-    }
-
-    @Override
-    public synchronized void deleteIfExists(String key) {
-        final File originalFile = getOriginalFile(key);
-        if (!originalFile.exists()) {
-            return;
-        }
-
-        boolean deleted = originalFile.delete();
-        if (!deleted) {
-            throw new PaperDbException("Couldn't delete file " + originalFile + " for table " + key);
+            throw new PaperDbException("Couldn't read/deserialize file " + originalFile
+                    + " for table " + key, e);
         }
     }
 
     private String getDbPath(Context context, String dbName) {
         return context.getFilesDir() + File.separator + dbName;
+    }
+
+    private void assertInit() {
+        if (!mIsInitialized) {
+            init();
+            mIsInitialized = true;
+        }
+    }
+
+    private void init() {
+        mFilesDir = getDbPath(mContext, mDbName);
+        if (!new File(mFilesDir).exists()) {
+            boolean isReady = new File(mFilesDir).mkdirs();
+            if (!isReady) {
+                throw new RuntimeException("Couldn't create Paper dir: " + mFilesDir);
+            }
+        }
     }
 
     private static boolean deleteDirectory(String dirPath) {
