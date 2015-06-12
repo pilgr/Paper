@@ -6,7 +6,7 @@ class PaperTable<T> {
     }
 
     PaperTable(T content) {
-        this.mContent = content;
+        mContent = content;
     }
 
     // Serialized content

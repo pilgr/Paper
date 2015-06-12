@@ -52,7 +52,7 @@ public class MultiThreadTest extends AndroidTestCase {
         return new Runnable() {
             @Override
             public void run() {
-                List<Person> selected = Paper.get("persons");
+                Paper.get("persons");
             }
         };
     }

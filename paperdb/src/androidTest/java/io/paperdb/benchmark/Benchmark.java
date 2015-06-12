@@ -29,8 +29,9 @@ import static android.support.test.InstrumentationRegistry.getTargetContext;
 @LargeTest
 public class Benchmark extends AndroidTestCase{
 
-    public static final String BENCHMARK_DATA = "benchmark-data";
-    private static int REPEAT_COUNT = 100;
+    private static final String BENCHMARK_DATA = "benchmark-data";
+    @SuppressWarnings("FieldCanBeLocal")
+    private static final int REPEAT_COUNT = 100;
 
     @Test
     public void testReadWrite100Items() throws Exception {

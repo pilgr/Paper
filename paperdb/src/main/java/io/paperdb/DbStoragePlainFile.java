@@ -24,7 +24,7 @@ public class DbStoragePlainFile implements Storage {
     private String mFilesDir;
     private boolean mIsInitialized;
 
-    protected Kryo getKryo() {
+    private Kryo getKryo() {
         return mKryo.get();
     }
 
