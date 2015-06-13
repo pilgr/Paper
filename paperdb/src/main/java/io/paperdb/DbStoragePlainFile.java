@@ -7,7 +7,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.serializers.VersionFieldSerializer;
+import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +33,8 @@ public class DbStoragePlainFile implements Storage {
         protected Kryo initialValue() {
             Kryo kryo = new Kryo();
             kryo.register(PaperTable.class);
-            kryo.setDefaultSerializer(VersionFieldSerializer.class);
+            kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+            kryo.setReferences(false);
             return kryo;
         }
     };
