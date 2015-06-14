@@ -5,26 +5,28 @@ import android.content.Context;
 public class Paper {
     static final String TAG = "paperdb";
 
-    private static final String DEFAULT_DB_NAME = "paperdb";
+    private static final String DEFAULT_DB_NAME = "io.paperdb";
 
     private static Paper INSTANCE;
 
     private final Storage mStorage;
 
-    public static void init(Context context) {
-        INSTANCE = new Paper(context);
+    public static Paper init(Context context) {
+        return INSTANCE = new Paper(context);
     }
 
-    public static void destroy(Context context) {
-        new Paper(context).mStorage.destroy();
+    public static void destroy() {
+        INSTANCE.mStorage.destroy();
+        INSTANCE = null;
     }
 
-    public static <T> void put(String key, T value) {
+    public static <T> Paper put(String key, T value) {
         if (value == null) {
             INSTANCE.mStorage.deleteIfExists(key);
-            return;
+        } else {
+            INSTANCE.mStorage.insert(key, value);
         }
-        INSTANCE.mStorage.insert(key, value);
+        return INSTANCE;
     }
 
     public static <T> T get(String key) {
@@ -40,8 +42,9 @@ public class Paper {
         return INSTANCE.mStorage.exist(tableName);
     }
 
-    public static void delete(String tableName) {
+    public static Paper delete(String tableName) {
         INSTANCE.mStorage.deleteIfExists(tableName);
+        return INSTANCE;
     }
 
     private Paper(Context context) {
