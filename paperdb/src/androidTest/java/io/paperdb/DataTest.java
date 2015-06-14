@@ -25,7 +25,7 @@ public class DataTest {
 
     @Before
     public void setUp() throws Exception {
-        Paper.destroy(getTargetContext());
+        Paper.clear(getTargetContext());
         Paper.init(getTargetContext());
     }
 

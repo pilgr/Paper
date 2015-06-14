@@ -11,13 +11,28 @@ public class Paper {
 
     private final Storage mStorage;
 
-    public static Paper init(Context context) {
-        return INSTANCE = new Paper(context);
+    /**
+     * Initializes Paper instance. Should be called before any other methods
+     * except {@link #clear(Context)}.
+     *
+     * @param context context
+     */
+    public static void init(Context context) {
+        INSTANCE = new Paper(context);
     }
 
-    public static void destroy() {
-        INSTANCE.mStorage.destroy();
-        INSTANCE = null;
+    /**
+     * Clears all data saved by Paper. Can be used when Paper yet not initialized
+     * by {@link #init(Context)}
+     *
+     * @param context context
+     */
+    public static void clear(Context context) {
+        if (INSTANCE == null) {
+            new Paper(context).mStorage.destroy();
+        } else {
+            INSTANCE.mStorage.destroy();
+        }
     }
 
     public static <T> Paper put(String key, T value) {

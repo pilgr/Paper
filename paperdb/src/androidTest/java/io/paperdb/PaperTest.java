@@ -18,7 +18,7 @@ public class PaperTest {
 
     @Before
     public void setUp() throws Exception {
-        Paper.destroy(getTargetContext());
+        Paper.clear(getTargetContext());
         Paper.init(getTargetContext());
     }
 
@@ -50,7 +50,7 @@ public class PaperTest {
         assertTrue(Paper.exist("persons"));
         assertTrue(Paper.exist("persons2"));
 
-        Paper.destroy(getTargetContext());
+        Paper.clear(getTargetContext());
         Paper.init(getTargetContext());
         assertFalse(Paper.exist("persons"));
         assertFalse(Paper.exist("persons2"));

@@ -56,7 +56,7 @@ public class Benchmark extends AndroidTestCase{
     }
 
     private void paperDbReadWrite(List data, int repeat) {
-        Paper.destroy(getTargetContext());
+        Paper.clear(getTargetContext());
         Paper.init(getTargetContext());
         for (int i = 0; i < repeat; i++) {
             Paper.put(BENCHMARK_DATA, data);
