@@ -14,6 +14,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+
+import de.javakaffee.kryoserializers.ArraysAsListSerializer;
+import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
+import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
+import io.paperdb.serializer.NoArgCollectionSerializer;
 
 import static io.paperdb.Paper.TAG;
 
@@ -31,13 +39,32 @@ public class DbStoragePlainFile implements Storage {
     private final ThreadLocal<Kryo> mKryo = new ThreadLocal<Kryo>() {
         @Override
         protected Kryo initialValue() {
-            Kryo kryo = new Kryo();
-            kryo.register(PaperTable.class);
-            kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
-            kryo.setReferences(false);
-            return kryo;
+            return createKryoInstance();
         }
     };
+
+    private Kryo createKryoInstance() {
+        Kryo kryo = new Kryo();
+
+        kryo.register(PaperTable.class);
+        kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+        kryo.setReferences(false);
+
+        // Serialize Arrays$ArrayList
+        //noinspection ArraysAsListWithZeroOrOneArgument
+        kryo.register(Arrays.asList("").getClass(), new ArraysAsListSerializer());
+        UnmodifiableCollectionsSerializer.registerSerializers(kryo);
+        SynchronizedCollectionsSerializer.registerSerializers(kryo);
+        // Serialize inner AbstractList$SubAbstractListRandomAccess
+        kryo.addDefaultSerializer(new ArrayList<>().subList(0, 0).getClass(),
+                new NoArgCollectionSerializer());
+        // Serialize AbstractList$SubAbstractList
+        kryo.addDefaultSerializer(new LinkedList<>().subList(0, 0).getClass(),
+                new NoArgCollectionSerializer());
+        // To keep backward compatibility don't change the order of serializers above
+
+        return kryo;
+    }
 
     public DbStoragePlainFile(Context context, String dbName) {
         mContext = context;
