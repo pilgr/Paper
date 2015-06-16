@@ -33,7 +33,7 @@ public class DataTest {
     public void testPutEmptyList() throws Exception {
         final List<Person> inserted = genPersonList(0);
         Paper.put("persons", inserted);
-        assertThat((List) Paper.get("persons")).isEmpty();
+        assertThat(Paper.<List>get("persons")).isEmpty();
     }
 
     @Test

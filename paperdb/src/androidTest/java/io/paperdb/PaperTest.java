@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.List;
+
 import io.paperdb.testdata.TestDataGenerator;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
@@ -44,16 +46,21 @@ public class PaperTest {
     }
 
     @Test
-    public void testDestroy() throws Exception {
+    public void testClear() throws Exception {
         Paper.put("persons", TestDataGenerator.genPersonList(10));
         Paper.put("persons2", TestDataGenerator.genPersonList(20));
         assertTrue(Paper.exist("persons"));
         assertTrue(Paper.exist("persons2"));
 
         Paper.clear(getTargetContext());
-        Paper.init(getTargetContext());
+        // init() call is not required after clear()
         assertFalse(Paper.exist("persons"));
         assertFalse(Paper.exist("persons2"));
+
+        // Should be possible to continue to use Paper after clear()
+        Paper.put("persons3", TestDataGenerator.genPersonList(30));
+        assertTrue(Paper.exist("persons3"));
+        assertThat(Paper.<List>get("persons3")).hasSize(30);
     }
 
     @Test

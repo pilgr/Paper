@@ -22,7 +22,7 @@ public class DbStoragePlainFile implements Storage {
     private final Context mContext;
     private final String mDbName;
     private String mFilesDir;
-    private boolean mIsInitialized;
+    private boolean mPaperDirIsCreated;
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -52,6 +52,7 @@ public class DbStoragePlainFile implements Storage {
         if (!deleteDirectory(dbPath)) {
             Log.e(TAG, "Couldn't delete Paper dir " + dbPath);
         }
+        mPaperDirIsCreated = false;
     }
 
     @Override
@@ -194,13 +195,13 @@ public class DbStoragePlainFile implements Storage {
     }
 
     private void assertInit() {
-        if (!mIsInitialized) {
-            init();
-            mIsInitialized = true;
+        if (!mPaperDirIsCreated) {
+            createPaperDir();
+            mPaperDirIsCreated = true;
         }
     }
 
-    private void init() {
+    private void createPaperDir() {
         mFilesDir = getDbPath(mContext, mDbName);
         if (!new File(mFilesDir).exists()) {
             boolean isReady = new File(mFilesDir).mkdirs();
