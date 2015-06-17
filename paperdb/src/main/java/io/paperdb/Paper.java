@@ -53,12 +53,12 @@ public class Paper {
         return value == null ? defaultValue : value;
     }
 
-    public static boolean exist(String tableName) {
-        return INSTANCE.mStorage.exist(tableName);
+    public static boolean exist(String key) {
+        return INSTANCE.mStorage.exist(key);
     }
 
-    public static Paper delete(String tableName) {
-        INSTANCE.mStorage.deleteIfExists(tableName);
+    public static Paper delete(String key) {
+        INSTANCE.mStorage.deleteIfExists(key);
         return INSTANCE;
     }
 
