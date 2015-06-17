@@ -25,23 +25,48 @@ public class CompatibilityTest {
     }
 
     @Test
-    public void testChangeClass() throws IllegalAccessException, NoSuchFieldException, InstantiationException {
-        TestClass tc = getClassInstanceWithNewName(TestClass.class, TestClassNew.class.getName());
-        tc.name = "original";
-        tc.value = "test";
-        tc.timestamp = 123;
+    public void testChangeClass()
+            throws IllegalAccessException, NoSuchFieldException, InstantiationException {
+        TestClass testClass
+                = getClassInstanceWithNewName(TestClass.class, TestClassNew.class.getName());
+        testClass.name = "original";
+        testClass.value = "test";
+        testClass.timestamp = 123;
 
         // Save original class. Only class name is changed to TestClassNew
-        Paper.put("test", tc);
+        Paper.put("test", testClass);
 
         // Read and instantiate a modified class TestClassNew based on saved data in TestClass
-        TestClassNew tc_new = Paper.get("test");
+        TestClassNew newTestClass = Paper.get("test");
         // Check original value is restored despite new default value in TestClassNew
-        assertThat(tc_new.name).isEqualTo("original");
+        assertThat(newTestClass.name).isEqualTo("original");
         // Check default value for new added field
-        assertThat(tc_new.newField).isEqualTo("default");
+        assertThat(newTestClass.newField).isEqualTo("default");
         // Check compatible field type change
-        assertThat(tc_new.timestamp).isEqualTo(123l);
+        assertThat(newTestClass.timestamp).isEqualTo(123l);
+    }
+
+    @Test(expected = PaperDbException.class)
+    public void testNotCompatibleClassChanges() throws Exception {
+        TestClass testClass = getClassInstanceWithNewName(TestClass.class,
+                TestClassNotCompatible.class.getName());
+        testClass.timestamp = 123;
+        Paper.put("not-compatible", testClass);
+
+        Paper.<TestClassNotCompatible>get("not-compatible");
+    }
+
+    @Test
+    public void testTransientFields() throws Exception {
+        TestClassTransient tc = new TestClassTransient();
+        tc.timestamp = 123;
+        tc.transientField = "changed";
+
+        Paper.put("transient-class", tc);
+
+        TestClassTransient readTc = Paper.get("transient-class");
+        assertThat(readTc.timestamp).isEqualTo(123);
+        assertThat(readTc.transientField).isEqualTo("default");
     }
 
     private <T> T getClassInstanceWithNewName(Class<T> classToInstantiate, String newName)
@@ -68,5 +93,20 @@ public class CompatibilityTest {
         public String newField = "default";
         public long timestamp;
     }
+
+    /**
+     * Emulates not compatible changes in class TestClass
+     */
+    public static class TestClassNotCompatible {
+        public String name = "not-compatible-class";
+        public String timestamp; //Changed field type long->String
+    }
+
+    public static class TestClassTransient {
+        public String name = "transient";
+        public transient String transientField = "default";
+        public int timestamp;
+    }
+
 
 }
