@@ -36,3 +36,5 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.3'
     androidTestCompile 'com.squareup.assertj:assertj-android:1.0.0'
 }
+
+apply from: '../publish.gradle'
