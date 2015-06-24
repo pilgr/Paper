@@ -1,9 +1,26 @@
-# paper
-Fast and simple data storage for Android. Currently under development.
+# Paper
+Data class storage for Android with focus on speed, simplicity and auto adaptation to class changes.
 
-License
--------
+Paper based on a following ideas:
+- Data on Android are relatively small. Prefer full read/write instead to partial select.
+- Flash storage is fast. Keep one item/collection per file.
+- Data class changes like new/removed fields can be handled automatically.
 
+###Add dependency
+```groovy
+compile 'io.paperdb:paperdb:0.9'
+```
+
+#### Initialize Paper
+#### Save
+#### Read
+#### Delete
+#### Handle data class changes
+#### Excluded fields
+#### Benchmark results
+##### Credits
+
+###License
     Copyright 2015 Aleksey Masny
 
     Licensed under the Apache License, Version 2.0 (the "License");
