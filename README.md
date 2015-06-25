@@ -1,19 +1,19 @@
 # Paper
-Fast and simple data storage for Android. Supports data upgrade for changed classes automatically.
+Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets you save/restore Java objects by using efficient Kryo serialization and handling data structure changes automatically.
 
-###Add dependency
+#### Add dependency
 ```groovy
 compile 'io.paperdb:paperdb:0.9'
 ```
 
 #### Initialize Paper
-Should be called in Application's or Activity's onCreate().
+Should be initialized one time in onCreate() in Application or Activity.
 
 ```java
 Paper.init(context);
 ```
 
-It's an UI friendly call. All other methods should be used in background thread.
+It's OK to call it in UI thread. All other methods should be used in background thread.
 
 #### Save
 Save data object. Your custom classes must have no-arg constructor.
@@ -26,7 +26,7 @@ Paper.put("countries", countryCodeMap); // HashMap
 ```
 
 #### Read
-Read data objects. Instantiates exactly the classes which has been used in saved data. Support limited backward and forward compatibility. See section "Handle data class changes".
+Read data objects. Instantiates exactly the classes which has been used in saved data. Support limited backward and forward compatibility. See [Handle data class changes](#handle-data-structure-changes).
 
 ```java
 String city = Paper.get("city");
@@ -49,37 +49,64 @@ Delete data for one key.
 Paper.delete("countries");
 ```
 
-Completely clear Paper storage. Can be executed regardless init() call.
+Completely clear Paper storage. Doesn't require to call init() before usage.
 
 ```java
 Paper.clear(context);
 ```
 
-#### Handle data class changes
-Removed class's fields are ignored on read and new fields have their default values on create class instance.
-
-#### Excluded fields
-Use <i>transient</i> modifier for class fields you don't want to save.
+#### Handle data structure changes
+Class fields which has been removed are ignored and new fields will have their default values. For example, if you have following data class saved in Paper storage:
 
 ```java
-public transient String tempId = "default";
+class Volcano {
+        public String name; // I like Eyjafjallajökull
+        public boolean isActive;
+    }
+```
+
+And then you realized you need to change the class like:
+
+```java
+class Volcano {
+        public String name; // I like Eyjafjallajökull
+        // public boolean isActive; removed field, who cares about volcano activity
+        public Location location; // New field
+    }
+```
+
+Then on restore updated class using old data the _isActive_ field will be ignored and new _location_ field will has default value _null_ (or what has been set to it in the no-arg constructor).
+
+#### Exclude fields
+Use _transient_ keyword for fields which you don't want to save.
+
+```java
+public transient String tempId = "default"; // Won't be saved
 ```
 
 #### How it works
-Paper based on the following assumptions:
+Paper is based on the following assumptions:
 - Saved data on mobile are relatively small;
-- Random file access on flash storage is fast.
+- Random file access on flash storage is very fast.
 
 So each data object is saved in separate file and put/get operations write/read whole file.
 
-The Kryo is used for object graph serialization and to provide data compatibility support.
+The [Kryo](https://github.com/EsotericSoftware/kryo) is used for object graph serialization and to provide data compatibility support.
 
 #### Benchmark results
+Running [Benchmark](https://github.com/pilgr/Paper/blob/master/paperdb/src/androidTest/java/io/paperdb/benchmark/Benchmark.java) on Nexus 4, in ms:
+
+| Benchmark                 | Paper    | [Hawk](https://github.com/orhanobut/hawk) | [sqlite](http://developer.android.com/reference/android/database/sqlite/package-summary.html) |
+|---------------------------|----------|----------|----------|
+| Read/write 500 contacts   | 187      | 447      |          |
+| Write 500 contacts        | 108      | 221      |          |
+| Read 500 contacts         | 79       | 155      |          |
+
 
 #### Apps using Paper
-AppDialer. Dramatically reduce start up time using Paper.
+- [AppDialer](https://play.google.com/store/apps/details?id=name.pilgr.appdialer) – Paper _initially_ has been developed to reduce start up time for AppDialer. Currently AppDialer has the best start up time in its class. And simple no-sql-pain data storage layer like a bonus.
 
-###License
+### License
     Copyright 2015 Aleksey Masny
 
     Licensed under the Apache License, Version 2.0 (the "License");
