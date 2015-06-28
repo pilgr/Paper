@@ -26,7 +26,7 @@ Paper.put("countries", countryCodeMap); // HashMap
 ```
 
 #### Read
-Read data objects. Instantiates exactly the classes which has been used in saved data. Support limited backward and forward compatibility. See [Handle data class changes](#handle-data-structure-changes).
+Read data objects. Paper instantiates exactly the classes which has been used in saved data. The limited backward and forward compatibility is supported. See [Handle data class changes](#handle-data-structure-changes).
 
 ```java
 String city = Paper.get("city");
@@ -56,7 +56,7 @@ Paper.clear(context);
 ```
 
 #### Handle data structure changes
-Class fields which has been removed are ignored and new fields will have their default values. For example, if you have following data class saved in Paper storage:
+Class fields which has been removed will be ignored on restore and new fields will have their default values. For example, if you have following data class saved in Paper storage:
 
 ```java
 class Volcano {
@@ -75,13 +75,35 @@ class Volcano {
     }
 ```
 
-Then on restore updated class using old data the _isActive_ field will be ignored and new _location_ field will has default value _null_ (or what has been set to it in the no-arg constructor).
+Then on restore the _isActive_ field will be ignored and new _location_ field will have its default value _null_.
 
 #### Exclude fields
-Use _transient_ keyword for fields which you don't want to save.
+Use _transient_ keyword for fields which you want to exclude from saving process.
 
 ```java
 public transient String tempId = "default"; // Won't be saved
+```
+#### Proguard config
+1. Keep data classes:
+
+```
+-keep class my.package.data.model.** { *; }
+```
+
+alternatively you can implement _Serializable_ in all your data classes and keep all of them using:
+
+```
+-keep class * implements java.io.Serializable { *; }
+```
+
+2. Keep library classes and its dependencies
+
+```
+-keep class io.paperdb.** { *; }
+-keep class com.esotericsoftware.** { *; }
+-dontwarn com.esotericsoftware.**
+-keep class de.javakaffee.kryoserializers.** { *; }
+-dontwarn de.javakaffee.kryoserializers.**
 ```
 
 #### How it works
