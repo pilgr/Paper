@@ -84,7 +84,7 @@ Use _transient_ keyword for fields which you want to exclude from saving process
 public transient String tempId = "default"; // Won't be saved
 ```
 #### Proguard config
-1. Keep data classes:
+* Keep data classes:
 
 ```
 -keep class my.package.data.model.** { *; }
@@ -96,7 +96,7 @@ alternatively you can implement _Serializable_ in all your data classes and keep
 -keep class * implements java.io.Serializable { *; }
 ```
 
-2. Keep library classes and its dependencies
+* Keep library classes and its dependencies
 
 ```
 -keep class io.paperdb.** { *; }
