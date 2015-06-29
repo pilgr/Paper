@@ -107,4 +107,23 @@ public class PaperTest {
         Paper.put("city", "Kyiv");
         assertThat(Paper.get("city")).isEqualTo("Kyiv");
     }
+
+    @Test
+    public void testValidKeyNames() {
+        Paper.put("city", "Lund");
+        assertThat(Paper.get("city")).isEqualTo("Lund");
+
+        Paper.put("city.dasd&%", "Lund");
+        assertThat(Paper.get("city.dasd&%")).isEqualTo("Lund");
+
+        Paper.put("city-ads", "Lund");
+        assertThat(Paper.get("city-ads")).isEqualTo("Lund");
+    }
+
+    @Test(expected=PaperDbException.class)
+    public void testInvalidKeyNameBackslash() {
+        Paper.put("city/ads", "Lund");
+        assertThat(Paper.get("city/ads")).isEqualTo("Lund");
+    }
+
 }
