@@ -20,110 +20,118 @@ public class PaperTest {
 
     @Before
     public void setUp() throws Exception {
-        Paper.clear(getTargetContext());
         Paper.init(getTargetContext());
+        Paper.book().clear(getTargetContext());
     }
 
     @Test
     public void testExist() throws Exception {
-        assertFalse(Paper.exist("persons"));
-        Paper.put("persons", TestDataGenerator.genPersonList(10));
-        assertTrue(Paper.exist("persons"));
+        assertFalse(Paper.book().exist("persons"));
+        Paper.book().write("persons", TestDataGenerator.genPersonList(10));
+        assertTrue(Paper.book().exist("persons"));
     }
 
     @Test
     public void testDelete() throws Exception {
-        Paper.put("persons", TestDataGenerator.genPersonList(10));
-        assertTrue(Paper.exist("persons"));
-        Paper.delete("persons");
-        assertFalse(Paper.exist("persons"));
+        Paper.book().write("persons", TestDataGenerator.genPersonList(10));
+        assertTrue(Paper.book().exist("persons"));
+        Paper.book().delete("persons");
+        assertFalse(Paper.book().exist("persons"));
     }
 
     @Test
     public void testDeleteNotExisted() throws Exception {
-        assertFalse(Paper.exist("persons"));
-        Paper.delete("persons");
+        assertFalse(Paper.book().exist("persons"));
+        Paper.book().delete("persons");
     }
 
     @Test
     public void testClear() throws Exception {
-        Paper.put("persons", TestDataGenerator.genPersonList(10));
-        Paper.put("persons2", TestDataGenerator.genPersonList(20));
-        assertTrue(Paper.exist("persons"));
-        assertTrue(Paper.exist("persons2"));
+        Paper.book().write("persons", TestDataGenerator.genPersonList(10));
+        Paper.book().write("persons2", TestDataGenerator.genPersonList(20));
+        assertTrue(Paper.book().exist("persons"));
+        assertTrue(Paper.book().exist("persons2"));
 
-        Paper.clear(getTargetContext());
+        Paper.book().clear(getTargetContext());
         // init() call is not required after clear()
-        assertFalse(Paper.exist("persons"));
-        assertFalse(Paper.exist("persons2"));
+        assertFalse(Paper.book().exist("persons"));
+        assertFalse(Paper.book().exist("persons2"));
 
         // Should be possible to continue to use Paper after clear()
-        Paper.put("persons3", TestDataGenerator.genPersonList(30));
-        assertTrue(Paper.exist("persons3"));
-        assertThat(Paper.<List>get("persons3")).hasSize(30);
+        Paper.book().write("persons3", TestDataGenerator.genPersonList(30));
+        assertTrue(Paper.book().exist("persons3"));
+        assertThat(Paper.book().<List>read("persons3")).hasSize(30);
     }
 
     @Test
     public void testPutGetNormal() {
-        Paper.put("city", "Lund");
-        String val = Paper.get("city", "default");
+        Paper.book().write("city", "Lund");
+        String val = Paper.book().read("city", "default");
         assertThat(val).isEqualTo("Lund");
     }
 
     @Test
     public void testPutGetNormalAfterReinit() {
-        Paper.put("city", "Lund");
-        String val = Paper.get("city", "default");
+        Paper.book().write("city", "Lund");
+        String val = Paper.book().read("city", "default");
         Paper.init(getTargetContext());// Reinit Paper instance
         assertThat(val).isEqualTo("Lund");
     }
 
     @Test
     public void testGetNotExisted() {
-        String val = Paper.get("non-existed");
+        String val = Paper.book().read("non-existed");
         assertThat(val).isNull();
     }
 
     @Test
     public void testGetDefault() {
-        String val = Paper.get("non-existed", "default");
+        String val = Paper.book().read("non-existed", "default");
         assertThat(val).isEqualTo("default");
     }
 
     @Test
     public void testPutNull() {
-        Paper.put("city", "Lund");
-        String val = Paper.get("city");
+        Paper.book().write("city", "Lund");
+        String val = Paper.book().read("city");
         assertThat(val).isEqualTo("Lund");
 
-        Paper.put("city", null);
-        String nullVal = Paper.get("city");
+        Paper.book().write("city", null);
+        String nullVal = Paper.book().read("city");
         assertThat(nullVal).isNull();
     }
 
     @Test
     public void testReplace() {
-        Paper.put("city", "Lund");
-        Paper.put("city", "Kyiv");
-        assertThat(Paper.get("city")).isEqualTo("Kyiv");
+        Paper.book().write("city", "Lund");
+        assertThat(Paper.book().read("city")).isEqualTo("Lund");
+        Paper.book().write("city", "Kyiv");
+        assertThat(Paper.book().read("city")).isEqualTo("Kyiv");
     }
 
     @Test
     public void testValidKeyNames() {
-        Paper.put("city", "Lund");
-        assertThat(Paper.get("city")).isEqualTo("Lund");
+        Paper.book().write("city", "Lund");
+        assertThat(Paper.book().read("city")).isEqualTo("Lund");
 
-        Paper.put("city.dasd&%", "Lund");
-        assertThat(Paper.get("city.dasd&%")).isEqualTo("Lund");
+        Paper.book().write("city.dasd&%", "Lund");
+        assertThat(Paper.book().read("city.dasd&%")).isEqualTo("Lund");
 
-        Paper.put("city-ads", "Lund");
-        assertThat(Paper.get("city-ads")).isEqualTo("Lund");
+        Paper.book().write("city-ads", "Lund");
+        assertThat(Paper.book().read("city-ads")).isEqualTo("Lund");
     }
 
     @Test(expected=PaperDbException.class)
     public void testInvalidKeyNameBackslash() {
-        Paper.put("city/ads", "Lund");
-        assertThat(Paper.get("city/ads")).isEqualTo("Lund");
+        Paper.book().write("city/ads", "Lund");
+        assertThat(Paper.book().read("city/ads")).isEqualTo("Lund");
     }
 
+    @Test(expected=PaperDbException.class)
+    public void testBookname() {
+        Paper.book().write("city", "Lund");
+        assertThat(Paper.book().read("city")).isEqualTo("Lund");
+        //TODO replace "io.paperdb" with the reflection which will take value from the class
+        Paper.book("io.paperdb").write("city", "Lund");
+    }
 }

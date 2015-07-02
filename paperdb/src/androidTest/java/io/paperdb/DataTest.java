@@ -23,47 +23,47 @@ import static io.paperdb.testdata.TestDataGenerator.genPersonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests List put/get API
+ * Tests List write/read API
  */
 @RunWith(AndroidJUnit4.class)
 public class DataTest {
 
     @Before
     public void setUp() throws Exception {
-        Paper.clear(getTargetContext());
         Paper.init(getTargetContext());
+        Paper.book().clear(getTargetContext());
     }
 
     @Test
     public void testPutEmptyList() throws Exception {
         final List<Person> inserted = genPersonList(0);
-        Paper.put("persons", inserted);
-        assertThat(Paper.<List>get("persons")).isEmpty();
+        Paper.book().write("persons", inserted);
+        assertThat(Paper.book().<List>read("persons")).isEmpty();
     }
 
     @Test
     public void testPutGetList() {
         final List<Person> inserted = genPersonList(10000);
-        Paper.put("persons", inserted);
-        List<Person> persons = Paper.get("persons");
+        Paper.book().write("persons", inserted);
+        List<Person> persons = Paper.book().read("persons");
         assertThat(persons).isEqualTo(inserted);
     }
 
     @Test
     public void testPutMap() {
         final Map<Integer, Person> inserted = genPersonMap(10000);
-        Paper.put("persons", inserted);
+        Paper.book().write("persons", inserted);
 
-        final Map<Integer, Person> personMap = Paper.get("persons");
+        final Map<Integer, Person> personMap = Paper.book().read("persons");
         assertThat(personMap).isEqualTo(inserted);
     }
 
     @Test
     public void testPutPOJO() {
         final Person person = genPerson(1);
-        Paper.put("profile", person);
+        Paper.book().write("profile", person);
 
-        final Person savedPerson = Paper.get("profile");
+        final Person savedPerson = Paper.book().read("profile");
         assertThat(savedPerson).isEqualTo(person);
         assertThat(savedPerson).isNotSameAs(person);
     }
@@ -134,8 +134,8 @@ public class DataTest {
     }
 
     private Object testReadWriteWithoutClassCheck(Object originObj) {
-        Paper.put("obj", originObj);
-        Object readObj = Paper.get("obj");
+        Paper.book().write("obj", originObj);
+        Object readObj = Paper.book().read("obj");
         assertThat(readObj).isEqualTo(originObj);
         return readObj;
     }

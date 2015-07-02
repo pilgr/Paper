@@ -43,7 +43,7 @@ public class MultiThreadTest extends AndroidTestCase {
             public void run() {
                 int size = new Random().nextInt(200);
                 final List<Person> inserted100 = TestDataGenerator.genPersonList(size);
-                Paper.put("persons", inserted100);
+                Paper.book().write("persons", inserted100);
             }
         };
     }
@@ -52,7 +52,7 @@ public class MultiThreadTest extends AndroidTestCase {
         return new Runnable() {
             @Override
             public void run() {
-                Paper.get("persons");
+                Paper.book().read("persons");
             }
         };
     }
