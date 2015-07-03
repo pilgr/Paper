@@ -1,4 +1,5 @@
 # Paper
+[![Build Status](https://travis-ci.org/pilgr/Paper.svg?branch=master)](https://travis-ci.org/pilgr/Paper)
 Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets you save/restore Java objects by using efficient Kryo serialization and handling data structure changes automatically.
 
 #### Add dependency
