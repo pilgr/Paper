@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Fast NoSQL data storage with auto-upgrade support to save any types of Plain Old Java Objects or
  * collections using Kryo serialization.
@@ -21,35 +23,66 @@ public class Paper {
 
     private static final String DEFAULT_DB_NAME = "io.paperdb";
 
-    private static Paper INSTANCE;
-
     private final Storage mStorage;
+
+    private static Context mContext;
+
+    private static ConcurrentHashMap<String, Paper> mPaperMap;
 
     /**
      * Lightweight method to init Paper instance. Should be executed in {@link Application#onCreate()}
      * or {@link android.app.Activity#onCreate(Bundle)}.
      * <p/>
-     * All {@link #put(String, Object)} and {@link #get(String)} methods should be called after this
+     * All {@link #write(String, Object)} and {@link #read(String)} methods should be called after this
      * method is executed.
      *
-     * @param context context, uses to get application context
+     * @param context context, used to get application context
      */
     public static void init(Context context) {
-        INSTANCE = new Paper(context);
+        mContext = context.getApplicationContext();
     }
 
     /**
-     * Clears all data saved by Paper. Can be used even when Paper yet not initialized
-     * by {@link #init(Context)}
+     * This method will create new book paper instance for specific name
      *
-     * @param context context
+     * @param name name of new database
+     * @return Paper instance
      */
-    public static void clear(Context context) {
-        if (INSTANCE == null) {
-            new Paper(context).mStorage.destroy();
-        } else {
-            INSTANCE.mStorage.destroy();
+    public static Paper book(String name) {
+        if (name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
+                " name is reserved for default library name");
+        return getBook(name);
+    }
+
+    /**
+     * This method will create new book paper instance for specific name
+     *
+     * @return Paper instance
+     */
+    public static Paper book() {
+        return getBook(DEFAULT_DB_NAME);
+    }
+
+    private static Paper getBook(String name) {
+        if (mContext == null) {
+            throw new PaperDbException("Paper.init is not called");
         }
+        if (mPaperMap == null) {
+            mPaperMap = new ConcurrentHashMap<>();
+        }
+        Paper paper = mPaperMap.get(name);
+        if (paper == null) {
+            paper = new Paper(mContext, name);
+            mPaperMap.put(name, paper);
+        }
+        return paper;
+    }
+
+    /**
+     * Destroys all data saved by Paper.
+     */
+    public void destroy() {
+        mStorage.destroy();
     }
 
     /**
@@ -60,13 +93,13 @@ public class Paper {
      * @param <T>   object type
      * @return this Paper instance
      */
-    public static <T> Paper put(String key, T value) {
+    public <T> Paper write(String key, T value) {
         if (value == null) {
-            INSTANCE.mStorage.deleteIfExists(key);
+            mStorage.deleteIfExists(key);
         } else {
-            INSTANCE.mStorage.insert(key, value);
+            mStorage.insert(key, value);
         }
-        return INSTANCE;
+        return this;
     }
 
     /**
@@ -79,8 +112,8 @@ public class Paper {
      * @param key object key to read
      * @return the saved object instance or null
      */
-    public static <T> T get(String key) {
-        return get(key, null);
+    public <T> T read(String key) {
+        return read(key, null);
     }
 
     /**
@@ -94,8 +127,8 @@ public class Paper {
      * @param defaultValue will be returned if key doesn't exist
      * @return the saved object instance or null
      */
-    public static <T> T get(String key, T defaultValue) {
-        T value = INSTANCE.mStorage.select(key);
+    public <T> T read(String key, T defaultValue) {
+        T value = mStorage.select(key);
         return value == null ? defaultValue : value;
     }
 
@@ -105,19 +138,17 @@ public class Paper {
      * @param key object key
      * @return true if object with given key exists in Paper storage, false otherwise
      */
-    public static boolean exist(String key) {
-        return INSTANCE.mStorage.exist(key);
+    public boolean exist(String key) {
+        return mStorage.exist(key);
     }
 
     /**
      * Delete saved object for given key if it is exist.
      *
      * @param key object key
-     * @return this Paper instance
      */
-    public static Paper delete(String key) {
-        INSTANCE.mStorage.deleteIfExists(key);
-        return INSTANCE;
+    public void delete(String key) {
+        mStorage.deleteIfExists(key);
     }
 
     private Paper(Context context) {
