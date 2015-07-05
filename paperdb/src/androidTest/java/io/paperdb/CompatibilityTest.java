@@ -20,8 +20,8 @@ public class CompatibilityTest {
 
     @Before
     public void setUp() throws Exception {
-        Paper.clear(getTargetContext());
         Paper.init(getTargetContext());
+        Paper.book().clear(getTargetContext());
     }
 
     @Test
@@ -34,10 +34,10 @@ public class CompatibilityTest {
         testClass.timestamp = 123;
 
         // Save original class. Only class name is changed to TestClassNew
-        Paper.put("test", testClass);
+        Paper.book().write("test", testClass);
 
         // Read and instantiate a modified class TestClassNew based on saved data in TestClass
-        TestClassNew newTestClass = Paper.get("test");
+        TestClassNew newTestClass = Paper.book().read("test");
         // Check original value is restored despite new default value in TestClassNew
         assertThat(newTestClass.name).isEqualTo("original");
         // Check default value for new added field
@@ -51,9 +51,9 @@ public class CompatibilityTest {
         TestClass testClass = getClassInstanceWithNewName(TestClass.class,
                 TestClassNotCompatible.class.getName());
         testClass.timestamp = 123;
-        Paper.put("not-compatible", testClass);
+        Paper.book().write("not-compatible", testClass);
 
-        Paper.<TestClassNotCompatible>get("not-compatible");
+        Paper.book().<TestClassNotCompatible>read("not-compatible");
     }
 
     @Test
@@ -62,9 +62,9 @@ public class CompatibilityTest {
         tc.timestamp = 123;
         tc.transientField = "changed";
 
-        Paper.put("transient-class", tc);
+        Paper.book().write("transient-class", tc);
 
-        TestClassTransient readTc = Paper.get("transient-class");
+        TestClassTransient readTc = Paper.book().read("transient-class");
         assertThat(readTc.timestamp).isEqualTo(123);
         assertThat(readTc.transientField).isEqualTo("default");
     }
