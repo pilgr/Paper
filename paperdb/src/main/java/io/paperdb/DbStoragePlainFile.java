@@ -153,9 +153,6 @@ public class DbStoragePlainFile implements Storage {
     }
 
     private File getOriginalFile(String key) {
-        //Because regexp is usually is quite heavy thing it is better to use simple contains method
-        if (key.contains(File.separator)) throw new PaperDbException("Invalid key for table: " +
-                key + " Invalid key. Separator aka '" + File.separator + "' is not allowed here");
         final String tablePath = mFilesDir + File.separator + key + ".pt";
         return new File(tablePath);
     }
