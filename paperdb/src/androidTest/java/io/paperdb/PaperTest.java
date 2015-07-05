@@ -21,7 +21,7 @@ public class PaperTest {
     @Before
     public void setUp() throws Exception {
         Paper.init(getTargetContext());
-        Paper.book().clear(getTargetContext());
+        Paper.book().destroy();
     }
 
     @Test
@@ -52,7 +52,7 @@ public class PaperTest {
         assertTrue(Paper.book().exist("persons"));
         assertTrue(Paper.book().exist("persons2"));
 
-        Paper.book().clear(getTargetContext());
+        Paper.book().destroy();
         // init() call is not required after clear()
         assertFalse(Paper.book().exist("persons"));
         assertFalse(Paper.book().exist("persons2"));

@@ -49,7 +49,9 @@ public class Paper {
      * @return Paper instance
      */
     public static Paper book(String name) {
-        return book(name, true);
+        if (name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
+                " name is reserved for default library name");
+        return getBook(name);
     }
 
     /**
@@ -58,15 +60,13 @@ public class Paper {
      * @return Paper instance
      */
     public static Paper book() {
-        return book(DEFAULT_DB_NAME, false);
+        return getBook(DEFAULT_DB_NAME);
     }
 
-    private static Paper book(String name, boolean user) {
+    private static Paper getBook(String name) {
         if (mContext == null) {
             throw new PaperDbException("Paper.init is not called");
         }
-        if (user && name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
-                " name is reserved for default library name");
         if (mPaperMap == null) {
             mPaperMap = new ConcurrentHashMap<>();
         }

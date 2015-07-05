@@ -32,7 +32,7 @@ public class Benchmark extends AndroidTestCase {
     public void testReadWrite500Contacts() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(500);
         Paper.init(getTargetContext());
-        Paper.book().clear(getTargetContext());
+        Paper.book().destroy();
         long paperTime = runTest(new PaperReadWriteContactsTest(), contacts, REPEAT_COUNT);
 
         Hawk.init(getTargetContext());
@@ -46,7 +46,7 @@ public class Benchmark extends AndroidTestCase {
     public void testWrite500Contacts() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(500);
         Paper.init(getTargetContext());
-        Paper.book().clear(getTargetContext());
+        Paper.book().destroy();
         long paperTime = runTest(new PaperWriteContactsTest(), contacts, REPEAT_COUNT);
 
         Hawk.init(getTargetContext());
@@ -60,7 +60,7 @@ public class Benchmark extends AndroidTestCase {
     public void testRead500Contacts() throws Exception {
         final List<Person> contacts = TestDataGenerator.genPersonList(500);
         Paper.init(getTargetContext());
-        Paper.book().clear(getTargetContext());
+        Paper.book().destroy();
         runTest(new PaperWriteContactsTest(), contacts, REPEAT_COUNT); //Prepare
         long paperTime = runTest(new PaperReadContactsTest(), contacts, REPEAT_COUNT);
 

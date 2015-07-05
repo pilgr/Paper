@@ -31,7 +31,7 @@ public class DataTest {
     @Before
     public void setUp() throws Exception {
         Paper.init(getTargetContext());
-        Paper.book().clear(getTargetContext());
+        Paper.book().destroy();
     }
 
     @Test
