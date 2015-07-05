@@ -23,18 +23,14 @@ public class Paper {
 
     private static final String DEFAULT_DB_NAME = "io.paperdb";
 
-    private final Storage mStorage;
-
     private static Context mContext;
 
-    private static ConcurrentHashMap<String, Paper> mPaperMap;
+    private static ConcurrentHashMap<String, Book> mBookMap;
 
     /**
      * Lightweight method to init Paper instance. Should be executed in {@link Application#onCreate()}
      * or {@link android.app.Activity#onCreate(Bundle)}.
      * <p/>
-     * All {@link #write(String, Object)} and {@link #read(String)} methods should be called after this
-     * method is executed.
      *
      * @param context context, used to get application context
      */
@@ -48,7 +44,7 @@ public class Paper {
      * @param name name of new database
      * @return Paper instance
      */
-    public static Paper book(String name) {
+    public static Book book(String name) {
         if (name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
                 " name is reserved for default library name");
         return getBook(name);
@@ -57,106 +53,24 @@ public class Paper {
     /**
      * This method will create new book paper instance for specific name
      *
-     * @return Paper instance
+     * @return Book instance
      */
-    public static Paper book() {
+    public static Book book() {
         return getBook(DEFAULT_DB_NAME);
     }
 
-    private static Paper getBook(String name) {
+    private static Book getBook(String name) {
         if (mContext == null) {
             throw new PaperDbException("Paper.init is not called");
         }
-        if (mPaperMap == null) {
-            mPaperMap = new ConcurrentHashMap<>();
+        if (mBookMap == null) {
+            mBookMap = new ConcurrentHashMap<>();
         }
-        Paper paper = mPaperMap.get(name);
-        if (paper == null) {
-            paper = new Paper(mContext, name);
-            mPaperMap.put(name, paper);
+        Book book = mBookMap.get(name);
+        if (book == null) {
+            book = new Book(mContext, name);
+            mBookMap.put(name, book);
         }
-        return paper;
+        return book;
     }
-
-    /**
-     * Destroys all data saved by Paper.
-     */
-    public void destroy() {
-        mStorage.destroy();
-    }
-
-    /**
-     * Saves any types of POJOs or collections in Paper storage.
-     *
-     * @param key   object key is used as part of object's file name
-     * @param value object to save, must have no-arg constructor
-     * @param <T>   object type
-     * @return this Paper instance
-     */
-    public <T> Paper write(String key, T value) {
-        if (value == null) {
-            mStorage.deleteIfExists(key);
-        } else {
-            mStorage.insert(key, value);
-        }
-        return this;
-    }
-
-    /**
-     * Instantiates saved object using original object class (e.g. LinkedList). Support limited
-     * backward and forward compatibility: removed fields are ignored, new fields have their
-     * default values.
-     * <p/>
-     * All instantiated objects must have no-arg constructors.
-     *
-     * @param key object key to read
-     * @return the saved object instance or null
-     */
-    public <T> T read(String key) {
-        return read(key, null);
-    }
-
-    /**
-     * Instantiates saved object using original object class (e.g. LinkedList). Support limited
-     * backward and forward compatibility: removed fields are ignored, new fields have their
-     * default values.
-     * <p/>
-     * All instantiated objects must have no-arg constructors.
-     *
-     * @param key          object key to read
-     * @param defaultValue will be returned if key doesn't exist
-     * @return the saved object instance or null
-     */
-    public <T> T read(String key, T defaultValue) {
-        T value = mStorage.select(key);
-        return value == null ? defaultValue : value;
-    }
-
-    /**
-     * Check if an object with the given key is saved in Paper storage.
-     *
-     * @param key object key
-     * @return true if object with given key exists in Paper storage, false otherwise
-     */
-    public boolean exist(String key) {
-        return mStorage.exist(key);
-    }
-
-    /**
-     * Delete saved object for given key if it is exist.
-     *
-     * @param key object key
-     */
-    public void delete(String key) {
-        mStorage.deleteIfExists(key);
-    }
-
-    private Paper(Context context) {
-        this(context, DEFAULT_DB_NAME);
-    }
-
-    private Paper(Context context, String dbName) {
-        mStorage = new DbStoragePlainFile(context.getApplicationContext(), dbName);
-    }
-
 }
