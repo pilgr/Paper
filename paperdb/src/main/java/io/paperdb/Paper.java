@@ -40,7 +40,6 @@ public class Paper {
      */
     public static void init(Context context) {
         mContext = context.getApplicationContext();
-        mPaperMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -63,9 +62,14 @@ public class Paper {
     }
 
     private static Paper book(String name, boolean user) {
-        if (mContext == null) throw new PaperDbException("Paper.init is not called");
+        if (mContext == null) {
+            throw new PaperDbException("Paper.init is not called");
+        }
         if (user && name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
                 " name is reserved for default library name");
+        if (mPaperMap == null) {
+            mPaperMap = new ConcurrentHashMap<>();
+        }
         Paper paper = mPaperMap.get(name);
         if (paper == null) {
             paper = new Paper(mContext, name);
@@ -73,13 +77,11 @@ public class Paper {
         }
         return paper;
     }
+
     /**
-     * Clears all data saved by Paper. Can be used even when Paper yet not initialized
-     * by {@link #init(Context)}
-     *
-     * @param context context
+     * Destroys all data saved by Paper.
      */
-    public void clear(Context context) {
+    public void destroy() {
         mStorage.destroy();
     }
 
@@ -144,11 +146,9 @@ public class Paper {
      * Delete saved object for given key if it is exist.
      *
      * @param key object key
-     * @return this Paper instance
      */
-    public Paper delete(String key) {
+    public void delete(String key) {
         mStorage.deleteIfExists(key);
-        return this;
     }
 
     private Paper(Context context) {
