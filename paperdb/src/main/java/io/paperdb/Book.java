@@ -21,13 +21,13 @@ public class Book {
      * Saves any types of POJOs or collections in Book storage.
      *
      * @param key   object key is used as part of object's file name
-     * @param value object to save, must have no-arg constructor
+     * @param value object to save, must have no-arg constructor, can't be null.
      * @param <T>   object type
      * @return this Book instance
      */
     public <T> Book write(String key, T value) {
         if (value == null) {
-            mStorage.deleteIfExists(key);
+            throw new PaperDbException("Paper doesn't support writing null root values");
         } else {
             mStorage.insert(key, value);
         }

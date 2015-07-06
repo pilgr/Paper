@@ -90,15 +90,9 @@ public class PaperTest {
         assertThat(val).isEqualTo("default");
     }
 
-    @Test
+    @Test(expected = PaperDbException.class)
     public void testWriteNull() {
-        Paper.book().write("city", "Lund");
-        String val = Paper.book().read("city");
-        assertThat(val).isEqualTo("Lund");
-
         Paper.book().write("city", null);
-        String nullVal = Paper.book().read("city");
-        assertThat(nullVal).isNull();
     }
 
     @Test
