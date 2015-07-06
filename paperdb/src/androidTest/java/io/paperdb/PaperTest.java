@@ -131,7 +131,6 @@ public class PaperTest {
     public void testBookname() {
         Paper.book().write("city", "Lund");
         assertThat(Paper.book().read("city")).isEqualTo("Lund");
-        //TODO replace "io.paperdb" with the reflection which will take value from the class
-        Paper.book("io.paperdb").write("city", "Lund");
+        Paper.book(Paper.DEFAULT_DB_NAME).write("city", "Lund");
     }
 }
