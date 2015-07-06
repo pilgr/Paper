@@ -21,11 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Paper {
     static final String TAG = "paperdb";
 
-    private static final String DEFAULT_DB_NAME = "io.paperdb";
+    static final String DEFAULT_DB_NAME = "io.paperdb";
 
     private static Context mContext;
 
-    private static ConcurrentHashMap<String, Book> mBookMap;
+    private static ConcurrentHashMap<String, Book> mBookMap = new ConcurrentHashMap<>();
 
     /**
      * Lightweight method to init Paper instance. Should be executed in {@link Application#onCreate()}
@@ -62,9 +62,6 @@ public class Paper {
     private static Book getBook(String name) {
         if (mContext == null) {
             throw new PaperDbException("Paper.init is not called");
-        }
-        if (mBookMap == null) {
-            mBookMap = new ConcurrentHashMap<>();
         }
         Book book = mBookMap.get(name);
         if (book == null) {
