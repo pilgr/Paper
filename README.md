@@ -51,11 +51,20 @@ Delete data for one key.
 Paper.book().delete("countries");
 ```
 
-Completely clear Paper storage. Doesn't require to call init() before usage.
+Completely destroys Paper storage. Requires to call ```Paper.init()``` before usage.
 
 ```java
-Paper.book().clear(context);
+Paper.book().destroy();
 ```
+
+#### Use custom book
+You can create custom Book with separate storage using
+
+```java
+Paper.book("custom-book")...;
+```
+
+Any changes in one book doesn't affect to others books.
 
 #### Handle data structure changes
 Class fields which has been removed will be ignored on restore and new fields will have their default values. For example, if you have following data class saved in Paper storage:
