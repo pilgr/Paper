@@ -64,14 +64,14 @@ public class PaperTest {
     }
 
     @Test
-    public void testPutGetNormal() {
+    public void testWriteReadNormal() {
         Paper.book().write("city", "Lund");
         String val = Paper.book().read("city", "default");
         assertThat(val).isEqualTo("Lund");
     }
 
     @Test
-    public void testPutGetNormalAfterReinit() {
+    public void testWriteReadNormalAfterReinit() {
         Paper.book().write("city", "Lund");
         String val = Paper.book().read("city", "default");
         Paper.init(getTargetContext());// Reinit Paper instance
@@ -79,19 +79,19 @@ public class PaperTest {
     }
 
     @Test
-    public void testGetNotExisted() {
+    public void testReadNotExisted() {
         String val = Paper.book().read("non-existed");
         assertThat(val).isNull();
     }
 
     @Test
-    public void testGetDefault() {
+    public void testReadDefault() {
         String val = Paper.book().read("non-existed", "default");
         assertThat(val).isEqualTo("default");
     }
 
     @Test
-    public void testPutNull() {
+    public void testWriteNull() {
         Paper.book().write("city", "Lund");
         String val = Paper.book().read("city");
         assertThat(val).isEqualTo("Lund");
@@ -128,9 +128,34 @@ public class PaperTest {
     }
 
     @Test(expected=PaperDbException.class)
-    public void testBookname() {
+    public void testGetBookWithDefaultBookName() {
+        Paper.book(Paper.DEFAULT_DB_NAME);
+    }
+
+    @Test
+    public void testCustomBookReadWrite() {
+        final String NATIVE = "native";
+        assertThat(Paper.book()).isNotSameAs(Paper.book(NATIVE));
+        Paper.book(NATIVE).destroy();
+
         Paper.book().write("city", "Lund");
+        Paper.book(NATIVE).write("city", "Kyiv");
+
         assertThat(Paper.book().read("city")).isEqualTo("Lund");
-        Paper.book(Paper.DEFAULT_DB_NAME).write("city", "Lund");
+        assertThat(Paper.book(NATIVE).read("city")).isEqualTo("Kyiv");
+    }
+
+    @Test
+    public void testCustomBookDestroy() {
+        final String NATIVE = "native";
+        Paper.book(NATIVE).destroy();
+
+        Paper.book().write("city", "Lund");
+        Paper.book(NATIVE).write("city", "Kyiv");
+
+        Paper.book(NATIVE).destroy();
+
+        assertThat(Paper.book().read("city")).isEqualTo("Lund");
+        assertThat(Paper.book(NATIVE).read("city")).isNull();
     }
 }

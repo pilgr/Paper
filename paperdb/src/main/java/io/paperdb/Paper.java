@@ -25,7 +25,7 @@ public class Paper {
 
     private static Context mContext;
 
-    private static ConcurrentHashMap<String, Book> mBookMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Book> mBookMap = new ConcurrentHashMap<>();
 
     /**
      * Lightweight method to init Paper instance. Should be executed in {@link Application#onCreate()}
@@ -39,7 +39,7 @@ public class Paper {
     }
 
     /**
-     * This method will create new book paper instance for specific name
+     * Returns paper book instance with the given name
      *
      * @param name name of new database
      * @return Paper instance
@@ -51,7 +51,7 @@ public class Paper {
     }
 
     /**
-     * This method will create new book paper instance for specific name
+     * Returns default paper book instance
      *
      * @return Book instance
      */
@@ -63,11 +63,13 @@ public class Paper {
         if (mContext == null) {
             throw new PaperDbException("Paper.init is not called");
         }
-        Book book = mBookMap.get(name);
-        if (book == null) {
-            book = new Book(mContext, name);
-            mBookMap.put(name, book);
+        synchronized (mBookMap) {
+            Book book = mBookMap.get(name);
+            if (book == null) {
+                book = new Book(mContext, name);
+                mBookMap.put(name, book);
+            }
+            return book;
         }
-        return book;
     }
 }
