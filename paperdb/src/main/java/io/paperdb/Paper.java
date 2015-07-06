@@ -72,4 +72,48 @@ public class Paper {
             return book;
         }
     }
+
+    /**
+     * @deprecated use Paper.book().write()
+     */
+    public static <T> Book put(String key, T value) {
+        return book().write(key, value);
+    }
+
+    /**
+     * @deprecated use Paper.book().read()
+     */
+    public static <T> T get(String key) {
+        return book().read(key);
+    }
+
+    /**
+     * @deprecated use Paper.book().read()
+     */
+    public static <T> T get(String key, T defaultValue) {
+        return book().read(key, defaultValue);
+    }
+
+    /**
+     * @deprecated use Paper.book().exist()
+     */
+    public static boolean exist(String key) {
+        return book().exist(key);
+    }
+
+    /**
+     * @deprecated use Paper.book().delete()
+     */
+    public static void delete(String key) {
+        book().delete(key);
+    }
+
+    /**
+     * @deprecated use Paper.book().destroy(). NOTE: Paper.init() be called
+     * before destroy()
+     */
+    public static void clear(Context context) {
+        init(context);
+        book().destroy();
+    }
 }
