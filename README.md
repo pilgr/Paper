@@ -3,7 +3,7 @@
 
 Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets you save/restore Java objects by using efficient Kryo serialization and handling data structure changes automatically.
 
-![Paper icon](https://raw.githubusercontent.com/pilgr/Paper/master/app/src/main/res/mipmap-xhdpi/ic_launcher.png)
+![Paper icon](/paper_icon.png)
 
 #### Add dependency
 ```groovy
