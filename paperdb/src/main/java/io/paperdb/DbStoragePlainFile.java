@@ -17,11 +17,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.UUID;
 
+import de.javakaffee.kryoserializers.UUIDSerializer;
+import de.javakaffee.kryoserializers.jodatime.JodaDateTimeSerializer;
 import de.javakaffee.kryoserializers.ArraysAsListSerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 import io.paperdb.serializer.NoArgCollectionSerializer;
+
+import org.joda.time.DateTime;
 
 import static io.paperdb.Paper.TAG;
 
@@ -53,6 +58,7 @@ public class DbStoragePlainFile implements Storage {
         // Serialize Arrays$ArrayList
         //noinspection ArraysAsListWithZeroOrOneArgument
         kryo.register(Arrays.asList("").getClass(), new ArraysAsListSerializer());
+
         UnmodifiableCollectionsSerializer.registerSerializers(kryo);
         SynchronizedCollectionsSerializer.registerSerializers(kryo);
         // Serialize inner AbstractList$SubAbstractListRandomAccess
@@ -62,6 +68,10 @@ public class DbStoragePlainFile implements Storage {
         kryo.addDefaultSerializer(new LinkedList<>().subList(0, 0).getClass(),
                 new NoArgCollectionSerializer());
         // To keep backward compatibility don't change the order of serializers above
+
+		// UUID and joda DateTime support
+		kryo.register(UUID.class, new UUIDSerializer());
+		kryo.register(DateTime.class, new JodaDateTimeSerializer());
 
         return kryo;
     }
