@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.esotericsoftware.kryo.Serializer;
+
 /**
  * Fast NoSQL data storage with auto-upgrade support to save any types of Plain Old Java Objects or
  * collections using Kryo serialization.
@@ -50,6 +52,17 @@ public class Paper {
         } else {
             INSTANCE.mStorage.destroy();
         }
+    }
+
+    /**
+     * Registers a type serializer/deserializer.
+     *
+     * @param type       type
+     * @param serializer serializer implementation
+     * @param <T>        object type
+     */
+    public static <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
+        INSTANCE.mStorage.registerSerializer(type, serializer);
     }
 
     /**

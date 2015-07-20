@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
+import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
@@ -19,14 +20,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.UUID;
 
-import de.javakaffee.kryoserializers.UUIDSerializer;
-import de.javakaffee.kryoserializers.jodatime.JodaDateTimeSerializer;
 import de.javakaffee.kryoserializers.ArraysAsListSerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
+import de.javakaffee.kryoserializers.UUIDSerializer;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 import io.paperdb.serializer.NoArgCollectionSerializer;
-
-import org.joda.time.DateTime;
 
 import static io.paperdb.Paper.TAG;
 
@@ -69,9 +67,8 @@ public class DbStoragePlainFile implements Storage {
                 new NoArgCollectionSerializer());
         // To keep backward compatibility don't change the order of serializers above
 
-		// UUID and joda DateTime support
-		kryo.register(UUID.class, new UUIDSerializer());
-		kryo.register(DateTime.class, new JodaDateTimeSerializer());
+        // UUID support
+        kryo.register(UUID.class, new UUIDSerializer());
 
         return kryo;
     }
@@ -160,6 +157,11 @@ public class DbStoragePlainFile implements Storage {
             throw new PaperDbException("Couldn't delete file " + originalFile
                     + " for table " + key);
         }
+    }
+
+    @Override
+    public <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
+        getKryo().register(type, serializer);
     }
 
     private File getOriginalFile(String key) {
