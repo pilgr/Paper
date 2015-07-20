@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -34,6 +35,7 @@ public class DbStoragePlainFile implements Storage {
     private final String mDbName;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
+    private HashMap<Class<?>, Serializer> customSerializers = new HashMap<>();
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -69,6 +71,11 @@ public class DbStoragePlainFile implements Storage {
 
         // UUID support
         kryo.register(UUID.class, new UUIDSerializer());
+
+        // Register custom serializers
+        for (Class<?> customType : customSerializers.keySet()) {
+            kryo.register(customType, customSerializers.get(customType));
+        }
 
         return kryo;
     }
@@ -161,6 +168,7 @@ public class DbStoragePlainFile implements Storage {
 
     @Override
     public <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
+        customSerializers.put(type, serializer);
         getKryo().register(type, serializer);
     }
 
