@@ -20,6 +20,7 @@ public class TestDataGenerator {
     @NonNull
     public static Person genPerson(int i) {
         Person p = new Person();
+        p.setName("Name" + i);
         p.setAge(i);
         p.setBikes(new String[2]);
         p.getBikes()[0] = "Kellys gen#" + i;
