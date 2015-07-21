@@ -1,6 +1,5 @@
 package io.paperdb;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -27,7 +26,6 @@ import static io.paperdb.Paper.TAG;
 
 public class DbStoragePlainFile implements Storage {
 
-    private final Context mContext;
     private final String mDbName;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
@@ -66,8 +64,8 @@ public class DbStoragePlainFile implements Storage {
         return kryo;
     }
 
-    public DbStoragePlainFile(Context context, String dbName) {
-        mContext = context;
+    public DbStoragePlainFile(File filesDir, String dbName) {
+        mFilesDir = getDbPath(filesDir, dbName);
         mDbName = dbName;
     }
 
@@ -75,9 +73,8 @@ public class DbStoragePlainFile implements Storage {
     public synchronized void destroy() {
         assertInit();
 
-        final String dbPath = getDbPath(mContext, mDbName);
-        if (!deleteDirectory(dbPath)) {
-            Log.e(TAG, "Couldn't delete Paper dir " + dbPath);
+        if (!deleteDirectory(mFilesDir)) {
+            Log.e(TAG, "Couldn't delete Paper dir " + mFilesDir);
         }
         mPaperDirIsCreated = false;
     }
@@ -87,6 +84,7 @@ public class DbStoragePlainFile implements Storage {
         assertInit();
 
         final PaperTable<E> paperTable = new PaperTable<>(value);
+        paperTable.removeReferences();
 
         final File originalFile = getOriginalFile(key);
         final File backupFile = makeBackupFile(originalFile);
@@ -106,6 +104,7 @@ public class DbStoragePlainFile implements Storage {
         }
 
         writeTableFile(key, paperTable, originalFile, backupFile);
+        paperTable.restoreReferences();
     }
 
     @Override
@@ -202,8 +201,9 @@ public class DbStoragePlainFile implements Storage {
             final Kryo kryo = getKryo();
             //noinspection unchecked
             final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
+            paperTable.restoreReferences();
             i.close();
-            return paperTable.mContent;
+            return paperTable.getContent();
         } catch (FileNotFoundException | KryoException e) {
             // Clean up an unsuccessfully written file
             if (originalFile.exists()) {
@@ -217,8 +217,8 @@ public class DbStoragePlainFile implements Storage {
         }
     }
 
-    private String getDbPath(Context context, String dbName) {
-        return context.getFilesDir() + File.separator + dbName;
+    private String getDbPath(File filesDir, String dbName) {
+        return filesDir + File.separator + dbName;
     }
 
     private void assertInit() {
@@ -229,7 +229,6 @@ public class DbStoragePlainFile implements Storage {
     }
 
     private void createPaperDir() {
-        mFilesDir = getDbPath(mContext, mDbName);
         if (!new File(mFilesDir).exists()) {
             boolean isReady = new File(mFilesDir).mkdirs();
             if (!isReady) {
