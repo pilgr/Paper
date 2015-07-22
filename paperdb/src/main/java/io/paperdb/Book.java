@@ -4,7 +4,7 @@ import android.content.Context;
 
 public class Book {
 
-    private final Storage mStorage;
+    private final CachedStorage mStorage;
 
     protected Book(Context context, String dbName) {
         mStorage = new DbStoragePlainFile(context.getApplicationContext().getFilesDir(), dbName);
@@ -75,7 +75,7 @@ public class Book {
     }
 
     /**
-     * Delete saved object for given key if it is exist.
+     * Delete saved object for given key if it exists.
      *
      * @param key object key
      */
@@ -83,4 +83,19 @@ public class Book {
         mStorage.deleteIfExists(key);
     }
 
+    /**
+     * Clears cache for given key.
+     *
+     * @param key object key
+     */
+    public void invalidateCache(String key) {
+        mStorage.invalidateCache(key);
+    }
+
+    /**
+     * Clears cache.
+     */
+    public void invalidateCache() {
+        mStorage.invalidateCache();
+    }
 }

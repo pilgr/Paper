@@ -7,6 +7,11 @@ import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
+import com.google.common.base.Optional;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import de.javakaffee.kryoserializers.ArraysAsListSerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
@@ -24,11 +31,23 @@ import io.paperdb.serializer.NoArgCollectionSerializer;
 
 import static io.paperdb.Paper.TAG;
 
-public class DbStoragePlainFile implements Storage {
+public class DbStoragePlainFile implements CachedStorage {
 
     private final String mDbName;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
+
+    private final LoadingCache<String, Optional> cache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .weakKeys()
+            .weakValues()
+            .expireAfterWrite(60 * 10, TimeUnit.SECONDS)
+            .build(new CacheLoader<String, Optional>() {
+                        public Optional load(String key) {
+                            Object value = doSelect(key);
+                            return Optional.fromNullable(value);
+                        }
+                    });
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -76,6 +95,7 @@ public class DbStoragePlainFile implements Storage {
         if (!deleteDirectory(mFilesDir)) {
             Log.e(TAG, "Couldn't delete Paper dir " + mFilesDir);
         }
+        cache.invalidateAll();
         mPaperDirIsCreated = false;
     }
 
@@ -103,10 +123,26 @@ public class DbStoragePlainFile implements Storage {
         }
 
         writeTableFile(key, paperTable, originalFile, backupFile);
+        cache.put(key, Optional.of(value));
     }
 
     @Override
     public synchronized <E> E select(String key) {
+        try {
+            Optional optional = cache.get(key);
+            return (E) optional.get();
+        } catch (IllegalStateException e) {
+            return null;
+        } catch (PaperDbException e) {
+            throw e;
+        } catch (Exception e) {
+            if (e.getCause() != null && e.getCause() instanceof PaperDbException)
+                throw (PaperDbException) e.getCause();
+            throw new PaperDbException(e);
+        }
+    }
+
+    private synchronized <E> E doSelect(String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -147,6 +183,7 @@ public class DbStoragePlainFile implements Storage {
             throw new PaperDbException("Couldn't delete file " + originalFile
                     + " for table " + key);
         }
+        cache.invalidate(key);
     }
 
     private File getOriginalFile(String key) {
@@ -269,6 +306,16 @@ public class DbStoragePlainFile implements Storage {
         } catch (IOException e) {
         }
         return false;
+    }
+
+    @Override
+    public void invalidateCache() {
+        cache.invalidateAll();
+    }
+
+    @Override
+    public void invalidateCache(String key) {
+        cache.invalidate(key);
     }
 }
 

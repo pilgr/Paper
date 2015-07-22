@@ -66,7 +66,7 @@ public class DataTest {
 
         final Person savedPerson = Paper.get("profile");
         assertThat(savedPerson).isEqualTo(person);
-        assertThat(savedPerson).isNotSameAs(person);
+        assertThat(savedPerson).isSameAs(person);
     }
 
     @Test

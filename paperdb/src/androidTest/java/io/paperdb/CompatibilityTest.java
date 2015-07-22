@@ -35,6 +35,7 @@ public class CompatibilityTest {
 
         // Save original class. Only class name is changed to TestClassNew
         Paper.book().write("test", testClass);
+        Paper.book().invalidateCache("test");
 
         // Read and instantiate a modified class TestClassNew based on saved data in TestClass
         TestClassNew newTestClass = Paper.book().read("test");
@@ -52,6 +53,7 @@ public class CompatibilityTest {
                 TestClassNotCompatible.class.getName());
         testClass.timestamp = 123;
         Paper.book().write("not-compatible", testClass);
+        Paper.book().invalidateCache("not-compatible");
 
         Paper.book().<TestClassNotCompatible>read("not-compatible");
     }
@@ -63,6 +65,7 @@ public class CompatibilityTest {
         tc.transientField = "changed";
 
         Paper.book().write("transient-class", tc);
+        Paper.book().invalidateCache("transient-class");
 
         TestClassTransient readTc = Paper.book().read("transient-class");
         assertThat(readTc.timestamp).isEqualTo(123);

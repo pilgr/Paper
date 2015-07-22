@@ -31,6 +31,7 @@ android {
 dependencies {
     compile 'com.esotericsoftware:kryo:3.0.2'
     compile 'de.javakaffee:kryo-serializers:0.33'
+    compile 'com.google.guava:guava:18.0'
 
     androidTestCompile 'com.orhanobut:hawk:1.14'
     androidTestCompile 'com.android.support.test:runner:0.3'

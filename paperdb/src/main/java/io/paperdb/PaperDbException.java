@@ -5,6 +5,10 @@ public class PaperDbException extends RuntimeException {
         super(detailMessage);
     }
 
+    public PaperDbException(Throwable throwable) {
+        super(throwable);
+    }
+
     public PaperDbException(String detailMessage, Throwable throwable) {
         super(detailMessage, throwable);
     }
