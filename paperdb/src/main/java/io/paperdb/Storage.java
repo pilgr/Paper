@@ -1,7 +1,5 @@
 package io.paperdb;
 
-import java.util.concurrent.ExecutionException;
-
 interface Storage {
 
     void destroy();
