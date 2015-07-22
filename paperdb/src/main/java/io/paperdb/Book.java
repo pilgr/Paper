@@ -92,7 +92,7 @@ public class Book {
      * @param serializer serializer implementation
      * @param <T>        object type
      */
-    public <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
+    <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
         mStorage.registerSerializer(type, serializer);
     }
 

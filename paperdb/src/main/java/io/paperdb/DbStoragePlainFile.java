@@ -35,7 +35,7 @@ public class DbStoragePlainFile implements Storage {
     private final String mDbName;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
-    private HashMap<Class<?>, Serializer> customSerializers = new HashMap<>();
+    private HashMap<Class<?>, Serializer> mCustomSerializers = new HashMap<>();
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -72,8 +72,8 @@ public class DbStoragePlainFile implements Storage {
         kryo.register(UUID.class, new UUIDSerializer());
 
         // Register custom serializers
-        for (Class<?> customType : customSerializers.keySet()) {
-            kryo.register(customType, customSerializers.get(customType));
+        for (Class<?> customType : mCustomSerializers.keySet()) {
+            kryo.register(customType, mCustomSerializers.get(customType));
         }
 
         return kryo;
@@ -168,7 +168,7 @@ public class DbStoragePlainFile implements Storage {
 
     @Override
     public <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
-        customSerializers.put(type, serializer);
+        mCustomSerializers.put(type, serializer);
         getKryo().register(type, serializer);
     }
 
