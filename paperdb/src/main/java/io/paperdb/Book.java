@@ -7,7 +7,7 @@ public class Book {
     private final CachedStorage mStorage;
 
     protected Book(Context context, String dbName) {
-        mStorage = new DbStoragePlainFile(context.getApplicationContext().getFilesDir(), dbName);
+        mStorage = new DbStoragePlainFile(context.getApplicationContext(), dbName);
     }
 
     /**
