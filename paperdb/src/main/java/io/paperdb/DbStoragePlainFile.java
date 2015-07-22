@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
+import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
@@ -16,10 +17,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.UUID;
 
 import de.javakaffee.kryoserializers.ArraysAsListSerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
+import de.javakaffee.kryoserializers.UUIDSerializer;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 import io.paperdb.serializer.NoArgCollectionSerializer;
 
@@ -31,6 +35,7 @@ public class DbStoragePlainFile implements Storage {
     private final String mDbName;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
+    private HashMap<Class<?>, Serializer> customSerializers = new HashMap<>();
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -62,6 +67,14 @@ public class DbStoragePlainFile implements Storage {
         kryo.addDefaultSerializer(new LinkedList<>().subList(0, 0).getClass(),
                 new NoArgCollectionSerializer());
         // To keep backward compatibility don't change the order of serializers above
+
+        // UUID support
+        kryo.register(UUID.class, new UUIDSerializer());
+
+        // Register custom serializers
+        for (Class<?> customType : customSerializers.keySet()) {
+            kryo.register(customType, customSerializers.get(customType));
+        }
 
         return kryo;
     }
@@ -150,6 +163,13 @@ public class DbStoragePlainFile implements Storage {
             throw new PaperDbException("Couldn't delete file " + originalFile
                     + " for table " + key);
         }
+    }
+
+
+    @Override
+    public <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
+        customSerializers.put(type, serializer);
+        getKryo().register(type, serializer);
     }
 
     private File getOriginalFile(String key) {

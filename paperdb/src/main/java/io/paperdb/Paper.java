@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.esotericsoftware.kryo.Serializer;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -115,5 +117,20 @@ public class Paper {
     public static void clear(Context context) {
         init(context);
         book().destroy();
+    }
+
+    /**
+     * Registers a type serializer/deserializer for all books.
+     * NOTE: use Paper.book(...).registerSerializer(...) to register the serializer
+     * only for a specific book.
+     *
+     * @param type       type
+     * @param serializer serializer implementation
+     * @param <T>        object type
+     */
+    public static <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
+        for (String bookName : mBookMap.keySet()) {
+            mBookMap.get(bookName).registerSerializer(type, serializer);
+        }
     }
 }
