@@ -65,7 +65,7 @@ public class DataTest {
 
         final Person savedPerson = Paper.book().read("profile");
         assertThat(savedPerson).isEqualTo(person);
-        assertThat(savedPerson).isNotSameAs(person);
+        assertThat(savedPerson).isSameAs(person);
     }
 
     @Test
