@@ -7,7 +7,7 @@ public class Book {
     private final Storage mStorage;
 
     protected Book(Context context, String dbName) {
-        mStorage = new DbStoragePlainFile(context.getApplicationContext(), dbName);
+        mStorage = new DbStoragePlainFile(context.getApplicationContext().getFilesDir(), dbName);
     }
 
     /**
