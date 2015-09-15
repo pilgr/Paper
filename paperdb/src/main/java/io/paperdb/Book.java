@@ -2,6 +2,8 @@ package io.paperdb;
 
 import android.content.Context;
 
+import com.esotericsoftware.kryo.Serializer;
+
 public class Book {
 
     private final Storage mStorage;
@@ -81,6 +83,17 @@ public class Book {
      */
     public void delete(String key) {
         mStorage.deleteIfExists(key);
+    }
+
+    /**
+     * Registers a type serializer/deserializer.
+     *
+     * @param type       type
+     * @param serializer serializer implementation
+     * @param <T>        object type
+     */
+    <T> void registerSerializer(Class<T> type, Serializer<T> serializer) {
+        mStorage.registerSerializer(type, serializer);
     }
 
 }
