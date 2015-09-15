@@ -24,40 +24,49 @@ Save data object. Your custom classes must have no-arg constructor.
 Paper creates separate data file for each key.
 
 ```java
-Paper.put("city", "Lund"); // Primitive
-Paper.put("task-queue", queue); // LinkedList
-Paper.put("countries", countryCodeMap); // HashMap
+Paper.book().write("city", "Lund"); // Primitive
+Paper.book().write("task-queue", queue); // LinkedList
+Paper.book().write("countries", countryCodeMap); // HashMap
 ```
 
 #### Read
 Read data objects. Paper instantiates exactly the classes which has been used in saved data. The limited backward and forward compatibility is supported. See [Handle data class changes](#handle-data-structure-changes).
 
 ```java
-String city = Paper.get("city");
-LinkedList queue = Paper.get("task-queue");
-HashMap countryCodeMap = Paper.get("countries");
+String city = Paper.book().read("city");
+LinkedList queue = Paper.book().read("task-queue");
+HashMap countryCodeMap = Paper.book().read("countries");
 ```
 
 Use default values if object doesn't exist in the storage.
 
 ```java
-String city = Paper.get("city", "Kyiv");
-LinkedList queue = Paper.get("task-queue", new LinkedList());
-HashMap countryCodeMap = Paper.get("countries", new HashMap());
+String city = Paper.book().read("city", "Kyiv");
+LinkedList queue = Paper.book().read("task-queue", new LinkedList());
+HashMap countryCodeMap = Paper.book().read("countries", new HashMap());
 ```
 
 #### Delete
 Delete data for one key.
 
 ```java
-Paper.delete("countries");
+Paper.book().delete("countries");
 ```
 
-Completely clear Paper storage. Doesn't require to call init() before usage.
+Completely destroys Paper storage. Requires to call ```Paper.init()``` before usage.
 
 ```java
-Paper.clear(context);
+Paper.book().destroy();
 ```
+
+#### Use custom book
+You can create custom Book with separate storage using
+
+```java
+Paper.book("custom-book")...;
+```
+
+Any changes in one book doesn't affect to others books.
 
 #### Handle data structure changes
 Class fields which has been removed will be ignored on restore and new fields will have their default values. For example, if you have following data class saved in Paper storage:
@@ -115,7 +124,7 @@ Paper is based on the following assumptions:
 - Saved data on mobile are relatively small;
 - Random file access on flash storage is very fast.
 
-So each data object is saved in separate file and put/get operations write/read whole file.
+So each data object is saved in separate file and write/read operations write/read whole file.
 
 The [Kryo](https://github.com/EsotericSoftware/kryo) is used for object graph serialization and to provide data compatibility support.
 

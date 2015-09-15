@@ -1,4 +1,4 @@
-package io.paperdb;
+package io.paperdb.deprecated;
 
 import android.support.test.runner.AndroidJUnit4;
 
@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import io.paperdb.testdata.ClassWithoutPublicNoArgConstructor;
+import io.paperdb.Paper;
 import io.paperdb.testdata.Person;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
@@ -24,47 +24,47 @@ import static io.paperdb.testdata.TestDataGenerator.genPersonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests List write/read API
+ * Tests deprecated put/get API
  */
 @RunWith(AndroidJUnit4.class)
 public class DataTest {
 
     @Before
     public void setUp() throws Exception {
+        Paper.clear(getTargetContext());
         Paper.init(getTargetContext());
-        Paper.book().destroy();
     }
 
     @Test
     public void testPutEmptyList() throws Exception {
         final List<Person> inserted = genPersonList(0);
-        Paper.book().write("persons", inserted);
-        assertThat(Paper.book().<List>read("persons")).isEmpty();
+        Paper.put("persons", inserted);
+        assertThat(Paper.<List>get("persons")).isEmpty();
     }
 
     @Test
     public void testPutGetList() {
         final List<Person> inserted = genPersonList(10000);
-        Paper.book().write("persons", inserted);
-        List<Person> persons = Paper.book().read("persons");
+        Paper.put("persons", inserted);
+        List<Person> persons = Paper.get("persons");
         assertThat(persons).isEqualTo(inserted);
     }
 
     @Test
     public void testPutMap() {
         final Map<Integer, Person> inserted = genPersonMap(10000);
-        Paper.book().write("persons", inserted);
+        Paper.put("persons", inserted);
 
-        final Map<Integer, Person> personMap = Paper.book().read("persons");
+        final Map<Integer, Person> personMap = Paper.get("persons");
         assertThat(personMap).isEqualTo(inserted);
     }
 
     @Test
     public void testPutPOJO() {
         final Person person = genPerson(1);
-        Paper.book().write("profile", person);
+        Paper.put("profile", person);
 
-        final Person savedPerson = Paper.book().read("profile");
+        final Person savedPerson = Paper.get("profile");
         assertThat(savedPerson).isEqualTo(person);
         assertThat(savedPerson).isNotSameAs(person);
     }
@@ -134,14 +134,9 @@ public class DataTest {
         testReadWrite(Collections.synchronizedList(new ArrayList<>()));
     }
 
-    @Test(expected = PaperDbException.class)
-    public void testReadWriteClassWithoutNoArgConstructor() {
-        testReadWrite(new ClassWithoutPublicNoArgConstructor("constructor argument"));
-    }
-
     private Object testReadWriteWithoutClassCheck(Object originObj) {
-        Paper.book().write("obj", originObj);
-        Object readObj = Paper.book().read("obj");
+        Paper.put("obj", originObj);
+        Object readObj = Paper.get("obj");
         assertThat(readObj).isEqualTo(originObj);
         return readObj;
     }

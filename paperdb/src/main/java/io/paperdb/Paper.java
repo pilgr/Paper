@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Fast NoSQL data storage with auto-upgrade support to save any types of Plain Old Java Objects or
  * collections using Kryo serialization.
@@ -19,113 +21,99 @@ import android.os.Bundle;
 public class Paper {
     static final String TAG = "paperdb";
 
-    private static final String DEFAULT_DB_NAME = "io.paperdb";
+    static final String DEFAULT_DB_NAME = "io.paperdb";
 
-    private static Paper INSTANCE;
+    private static Context mContext;
 
-    private final Storage mStorage;
+    private static final ConcurrentHashMap<String, Book> mBookMap = new ConcurrentHashMap<>();
 
     /**
      * Lightweight method to init Paper instance. Should be executed in {@link Application#onCreate()}
      * or {@link android.app.Activity#onCreate(Bundle)}.
      * <p/>
-     * All {@link #put(String, Object)} and {@link #get(String)} methods should be called after this
-     * method is executed.
      *
-     * @param context context, uses to get application context
+     * @param context context, used to get application context
      */
     public static void init(Context context) {
-        INSTANCE = new Paper(context);
+        mContext = context.getApplicationContext();
     }
 
     /**
-     * Clears all data saved by Paper. Can be used even when Paper yet not initialized
-     * by {@link #init(Context)}
+     * Returns paper book instance with the given name
      *
-     * @param context context
+     * @param name name of new database
+     * @return Paper instance
      */
-    public static void clear(Context context) {
-        if (INSTANCE == null) {
-            new Paper(context).mStorage.destroy();
-        } else {
-            INSTANCE.mStorage.destroy();
+    public static Book book(String name) {
+        if (name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
+                " name is reserved for default library name");
+        return getBook(name);
+    }
+
+    /**
+     * Returns default paper book instance
+     *
+     * @return Book instance
+     */
+    public static Book book() {
+        return getBook(DEFAULT_DB_NAME);
+    }
+
+    private static Book getBook(String name) {
+        if (mContext == null) {
+            throw new PaperDbException("Paper.init is not called");
+        }
+        synchronized (mBookMap) {
+            Book book = mBookMap.get(name);
+            if (book == null) {
+                book = new Book(mContext, name);
+                mBookMap.put(name, book);
+            }
+            return book;
         }
     }
 
     /**
-     * Saves any types of POJOs or collections in Paper storage.
-     *
-     * @param key   object key is used as part of object's file name
-     * @param value object to save, must have no-arg constructor
-     * @param <T>   object type
-     * @return this Paper instance
+     * @deprecated use Paper.book().write()
      */
-    public static <T> Paper put(String key, T value) {
-        if (value == null) {
-            INSTANCE.mStorage.deleteIfExists(key);
-        } else {
-            INSTANCE.mStorage.insert(key, value);
-        }
-        return INSTANCE;
+    public static <T> Book put(String key, T value) {
+        return book().write(key, value);
     }
 
     /**
-     * Instantiates saved object using original object class (e.g. LinkedList). Support limited
-     * backward and forward compatibility: removed fields are ignored, new fields have their
-     * default values.
-     * <p/>
-     * All instantiated objects must have no-arg constructors.
-     *
-     * @param key object key to read
-     * @return the saved object instance or null
+     * @deprecated use Paper.book().read()
      */
     public static <T> T get(String key) {
-        return get(key, null);
+        return book().read(key);
     }
 
     /**
-     * Instantiates saved object using original object class (e.g. LinkedList). Support limited
-     * backward and forward compatibility: removed fields are ignored, new fields have their
-     * default values.
-     * <p/>
-     * All instantiated objects must have no-arg constructors.
-     *
-     * @param key          object key to read
-     * @param defaultValue will be returned if key doesn't exist
-     * @return the saved object instance or null
+     * @deprecated use Paper.book().read()
      */
     public static <T> T get(String key, T defaultValue) {
-        T value = INSTANCE.mStorage.select(key);
-        return value == null ? defaultValue : value;
+        return book().read(key, defaultValue);
     }
 
     /**
-     * Check if an object with the given key is saved in Paper storage.
-     *
-     * @param key object key
-     * @return true if object with given key exists in Paper storage, false otherwise
+     * @deprecated use Paper.book().exist()
      */
     public static boolean exist(String key) {
-        return INSTANCE.mStorage.exist(key);
+        return book().exist(key);
     }
 
     /**
-     * Delete saved object for given key if it is exist.
-     *
-     * @param key object key
-     * @return this Paper instance
+     * @deprecated use Paper.book().delete()
      */
-    public static Paper delete(String key) {
-        INSTANCE.mStorage.deleteIfExists(key);
-        return INSTANCE;
+    public static void delete(String key) {
+        book().delete(key);
     }
 
-    private Paper(Context context) {
-        this(context, DEFAULT_DB_NAME);
+    /**
+     * @deprecated use Paper.book().destroy(). NOTE: Paper.init() be called
+     * before destroy()
+     */
+    public static void clear(Context context) {
+        init(context);
+        book().destroy();
     }
-
-    private Paper(Context context, String dbName) {
-        mStorage = new DbStoragePlainFile(context.getApplicationContext(), dbName);
-    }
-
 }
