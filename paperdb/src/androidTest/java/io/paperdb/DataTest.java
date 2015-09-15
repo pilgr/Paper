@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import io.paperdb.testdata.ClassWithoutPublicNoArgConstructor;
 import io.paperdb.testdata.Person;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
@@ -131,6 +132,11 @@ public class DataTest {
     @Test
     public void testPutSynchronizedList() {
         testReadWrite(Collections.synchronizedList(new ArrayList<>()));
+    }
+
+    @Test(expected = PaperDbException.class)
+    public void testReadWriteClassWithoutNoArgConstructor() {
+        testReadWrite(new ClassWithoutPublicNoArgConstructor("constructor argument"));
     }
 
     private Object testReadWriteWithoutClassCheck(Object originObj) {
