@@ -7,7 +7,7 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 
 #### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:0.9'
+compile 'io.paperdb:paperdb:1.0'
 ```
 
 #### Initialize Paper
@@ -20,7 +20,7 @@ Paper.init(context);
 It's OK to call it in UI thread. All other methods should be used in background thread.
 
 #### Save
-Save data object. Your custom classes must have no-arg constructor.
+Save data object. **Your custom classes must have no-arg constructor.**
 Paper creates separate data file for each key.
 
 ```java
