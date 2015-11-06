@@ -16,7 +16,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.javakaffee.kryoserializers.ArraysAsListSerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
@@ -134,6 +136,23 @@ public class DbStoragePlainFile implements Storage {
 
         final File originalFile = getOriginalFile(key);
         return originalFile.exists();
+    }
+
+    @Override
+    public List<String> getAllKeys() {
+        assertInit();
+        File bookFolder = new File(mFilesDir);
+        String[] names = bookFolder.list();
+        if (names!=null){
+            //remove extensions
+            for (int i = 0; i<names.length; i++){
+                names[i] = names[i].replace(".pt","");
+            }
+            return Arrays.asList(names);
+        } else{
+            return new ArrayList<String>();
+        }
+
     }
 
     @Override
