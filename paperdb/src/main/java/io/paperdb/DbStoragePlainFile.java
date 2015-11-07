@@ -141,18 +141,18 @@ public class DbStoragePlainFile implements Storage {
     @Override
     public List<String> getAllKeys() {
         assertInit();
+
         File bookFolder = new File(mFilesDir);
         String[] names = bookFolder.list();
-        if (names!=null){
+        if (names != null) {
             //remove extensions
-            for (int i = 0; i<names.length; i++){
-                names[i] = names[i].replace(".pt","");
+            for (int i = 0; i < names.length; i++) {
+                names[i] = names[i].replace(".pt", "");
             }
             return Arrays.asList(names);
-        } else{
-            return new ArrayList<String>();
+        } else {
+            return new ArrayList<>();
         }
-
     }
 
     @Override

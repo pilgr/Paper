@@ -86,9 +86,12 @@ public class Book {
     }
 
     /**
-     * return all keys for objects in book.
-     * @return
+     * Returns all keys for objects in book.
+     *
+     * @return all keys
      */
-    public List<String> getAllKeys(){return mStorage.getAllKeys();}
+    public List<String> getAllKeys() {
+        return mStorage.getAllKeys();
+    }
 
 }
