@@ -2,6 +2,8 @@ package io.paperdb;
 
 import android.content.Context;
 
+import java.util.List;
+
 public class Book {
 
     private final Storage mStorage;
@@ -82,5 +84,11 @@ public class Book {
     public void delete(String key) {
         mStorage.deleteIfExists(key);
     }
+
+    /**
+     * return all keys for objects in book.
+     * @return
+     */
+    public List<String> getAllKeys(){return mStorage.getAllKeys();}
 
 }

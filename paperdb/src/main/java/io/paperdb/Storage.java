@@ -1,5 +1,7 @@
 package io.paperdb;
 
+import java.util.List;
+
 interface Storage {
 
     void destroy();
@@ -11,4 +13,6 @@ interface Storage {
     boolean exist(String key);
 
     void deleteIfExists(String key);
+
+    List<String> getAllKeys();
 }
