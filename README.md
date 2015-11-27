@@ -7,7 +7,7 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 
 #### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:1.0'
+compile 'io.paperdb:paperdb:1.1'
 ```
 
 #### Initialize Paper
@@ -65,8 +65,14 @@ You can create custom Book with separate storage using
 ```java
 Paper.book("custom-book")...;
 ```
+Each book is located in separate file folder.
 
-Any changes in one book doesn't affect to others books.
+#### Get all keys 
+Returns all keys for objects in the book.
+
+```
+List<String> allKeys = Paper.book().getAllKeys();
+```
 
 #### Handle data structure changes
 Class fields which has been removed will be ignored on restore and new fields will have their default values. For example, if you have following data class saved in Paper storage:
@@ -103,20 +109,10 @@ public transient String tempId = "default"; // Won't be saved
 -keep class my.package.data.model.** { *; }
 ```
 
-alternatively you can implement _Serializable_ in all your data classes and keep all of them using:
+alternatively you can implement _Serializable_ for all your data classes and keep all of them using:
 
 ```
 -keep class * implements java.io.Serializable { *; }
-```
-
-* Keep library classes and its dependencies
-
-```
--keep class io.paperdb.** { *; }
--keep class com.esotericsoftware.** { *; }
--dontwarn com.esotericsoftware.**
--keep class de.javakaffee.kryoserializers.** { *; }
--dontwarn de.javakaffee.kryoserializers.**
 ```
 
 #### How it works
