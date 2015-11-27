@@ -103,20 +103,10 @@ public transient String tempId = "default"; // Won't be saved
 -keep class my.package.data.model.** { *; }
 ```
 
-alternatively you can implement _Serializable_ in all your data classes and keep all of them using:
+alternatively you can implement _Serializable_ for all your data classes and keep all of them using:
 
 ```
 -keep class * implements java.io.Serializable { *; }
-```
-
-* Keep library classes and its dependencies
-
-```
--keep class io.paperdb.** { *; }
--keep class com.esotericsoftware.** { *; }
--dontwarn com.esotericsoftware.**
--keep class de.javakaffee.kryoserializers.** { *; }
--dontwarn de.javakaffee.kryoserializers.**
 ```
 
 #### How it works
