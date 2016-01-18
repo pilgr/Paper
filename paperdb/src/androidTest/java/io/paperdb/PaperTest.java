@@ -3,6 +3,7 @@ package io.paperdb;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -170,12 +171,12 @@ public class PaperTest {
         assertThat(allKeys.contains("city1")).isTrue();
         assertThat(allKeys.contains("city2")).isTrue();
     }
-    
+
     @Test
     public void testCustomSerializer() {
         Paper.addSerializer(DateTime.class, new JodaDateTimeSerializer());
-        
-        DateTime now = DateTime.now();
+
+        DateTime now = DateTime.now(DateTimeZone.UTC);
         Paper.book().write("joda-datetime", now);
         assertEquals(Paper.book().read("joda-datetime"), now);
     }
