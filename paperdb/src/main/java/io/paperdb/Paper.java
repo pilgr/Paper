@@ -129,11 +129,7 @@ public class Paper {
      * @param serializer the serializer instance
      * @param <T>        type of the serializer
      */
-    public static <T> void addSerializer(Class<T> clazz, Serializer<T> serializer) 
-            throws PaperDbException {
-        if (mBookMap.size() > 0)
-            throw new PaperDbException("Custom serializers must be added right after init()");
-
+    public static <T> void addSerializer(Class<T> clazz, Serializer<T> serializer) {
         if (!mCustomSerializers.containsKey(clazz))
             mCustomSerializers.put(clazz, serializer);
     }
