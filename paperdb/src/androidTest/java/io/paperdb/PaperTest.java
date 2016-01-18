@@ -25,6 +25,7 @@ public class PaperTest {
     @Before
     public void setUp() throws Exception {
         Paper.init(getTargetContext());
+        Paper.addSerializer(DateTime.class, new JodaDateTimeSerializer());
         Paper.book().destroy();
     }
 
@@ -174,8 +175,6 @@ public class PaperTest {
 
     @Test
     public void testCustomSerializer() {
-        Paper.addSerializer(DateTime.class, new JodaDateTimeSerializer());
-
         DateTime now = DateTime.now(DateTimeZone.UTC);
         Paper.book().write("joda-datetime", now);
         assertEquals(Paper.book().read("joda-datetime"), now);
