@@ -37,6 +37,7 @@ dependencies {
     androidTestCompile 'com.orhanobut:hawk:1.14'
     androidTestCompile 'com.android.support.test:runner:0.3'
     androidTestCompile 'com.squareup.assertj:assertj-android:1.0.0'
+    androidTestCompile 'joda-time:joda-time:2.9.1'
 }
 
 apply from: '../publish.gradle'

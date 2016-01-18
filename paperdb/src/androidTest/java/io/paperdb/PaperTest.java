@@ -2,15 +2,18 @@ package io.paperdb;
 
 import android.support.test.runner.AndroidJUnit4;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
 
+import de.javakaffee.kryoserializers.jodatime.JodaDateTimeSerializer;
 import io.paperdb.testdata.TestDataGenerator;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -21,6 +24,7 @@ public class PaperTest {
     @Before
     public void setUp() throws Exception {
         Paper.init(getTargetContext());
+        Paper.addSerializer(DateTime.class, new JodaDateTimeSerializer());
         Paper.book().destroy();
     }
 
@@ -167,5 +171,11 @@ public class PaperTest {
         assertThat(allKeys.contains("city1")).isTrue();
         assertThat(allKeys.contains("city2")).isTrue();
     }
-
+    
+    @Test
+    public void testCustomSerializer() {
+        DateTime now = DateTime.now();
+        Paper.book().write("joda-datetime", now);
+        assertEquals(Paper.book().read("joda-datetime"), now);
+    }
 }

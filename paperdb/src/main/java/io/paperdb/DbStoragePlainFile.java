@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
+import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
@@ -16,12 +17,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.javakaffee.kryoserializers.ArraysAsListSerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
+import de.javakaffee.kryoserializers.UUIDSerializer;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 import io.paperdb.serializer.NoArgCollectionSerializer;
 
@@ -31,6 +33,7 @@ public class DbStoragePlainFile implements Storage {
 
     private final Context mContext;
     private final String mDbName;
+    private final HashMap<Class, Serializer> mCustomSerializers;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
 
@@ -65,12 +68,22 @@ public class DbStoragePlainFile implements Storage {
                 new NoArgCollectionSerializer());
         // To keep backward compatibility don't change the order of serializers above
 
+        // UUID support
+        kryo.register(UUID.class, new UUIDSerializer());
+        
+        for (Class<?> clazz : mCustomSerializers.keySet())
+            kryo.register(clazz, mCustomSerializers.get(clazz));
+ 
         return kryo;
     }
 
-    public DbStoragePlainFile(Context context, String dbName) {
+    public DbStoragePlainFile(
+            Context context, 
+            String dbName, 
+            HashMap<Class, Serializer> serializers) {
         mContext = context;
         mDbName = dbName;
+        mCustomSerializers = serializers;
     }
 
     @Override
