@@ -122,7 +122,7 @@ public class Paper {
     }
     
     /**
-     * Add a custom serializer for a class without no-arg constructor.
+     * Adds a custom serializer for a specific class
      * When used, must be called right after Paper.init()
      *
      * @param clazz      type of the custom serializer
