@@ -10,6 +10,8 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 
+import org.objenesis.strategy.StdInstantiatorStrategy;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -74,14 +76,15 @@ public class DbStoragePlainFile implements Storage {
         
         for (Class<?> clazz : mCustomSerializers.keySet())
             kryo.register(clazz, mCustomSerializers.get(clazz));
- 
+
+        kryo.setInstantiatorStrategy(
+                new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+
         return kryo;
     }
 
-    public DbStoragePlainFile(
-            Context context, 
-            String dbName, 
-            HashMap<Class, Serializer> serializers) {
+    public DbStoragePlainFile(Context context, String dbName,
+                              HashMap<Class, Serializer> serializers) {
         mContext = context;
         mDbName = dbName;
         mCustomSerializers = serializers;

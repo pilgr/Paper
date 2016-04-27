@@ -14,8 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import io.paperdb.testdata.ClassWithoutPublicNoArgConstructor;
 import io.paperdb.testdata.Person;
+import io.paperdb.testdata.PersonArg;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static io.paperdb.testdata.TestDataGenerator.genPerson;
@@ -61,7 +61,7 @@ public class DataTest {
 
     @Test
     public void testPutPOJO() {
-        final Person person = genPerson(1);
+        final Person person = genPerson(new Person(), 1);
         Paper.book().write("profile", person);
 
         final Person savedPerson = Paper.book().read("profile");
@@ -134,9 +134,9 @@ public class DataTest {
         testReadWrite(Collections.synchronizedList(new ArrayList<>()));
     }
 
-    @Test(expected = PaperDbException.class)
+    @Test()
     public void testReadWriteClassWithoutNoArgConstructor() {
-        testReadWrite(new ClassWithoutPublicNoArgConstructor("constructor argument"));
+        testReadWrite(new PersonArg("name"));
     }
 
     private Object testReadWriteWithoutClassCheck(Object originObj) {
