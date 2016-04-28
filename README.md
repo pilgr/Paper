@@ -6,13 +6,13 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 ![Paper icon](/paper_icon.png)
 
 #### What's new in 1.5
-* Save any kind of classes. No more restriction to use only classes having no-arg constructor.
-* Custom serializers can be added using `Paper.addSerializer()`
-* Kotlin is fully supported, including `data class`es.
+* Save all the things! No more restriction to use classes only having no-arg constructor.
+* Custom serializers can be added using `Paper.addSerializer()`.
+* Kotlin is fully supported now, including saving `data class`es. Obviously saving lambdas is not supported.
 
 #### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:1.5-rc1'
+compile 'io.paperdb:paperdb:1.5'
 ```
 
 #### Initialize Paper
@@ -25,7 +25,7 @@ Paper.init(context);
 It's OK to call it in UI thread. All other methods should be used in background thread.
 
 #### Save
-Save data object. **Your custom classes must have no-arg constructor.**
+Save data object.
 Paper creates separate data file for each key.
 
 ```java
