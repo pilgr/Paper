@@ -5,7 +5,7 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 
 ![Paper icon](/paper_icon.png)
 
-#### What's new in 1.5
+#### What's [new](/CHANGELOG.md) in 1.5
 * Save all the things! No more restriction to use classes only having no-arg constructor.
 * Custom serializers can be added using `Paper.addSerializer()`.
 * Kotlin is fully supported now, including saving `data class`es. Obviously saving lambdas is not supported.
