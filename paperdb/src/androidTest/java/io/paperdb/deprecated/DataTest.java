@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests deprecated put/get API
  */
+@SuppressWarnings("deprecation")
 @RunWith(AndroidJUnit4.class)
 public class DataTest {
 
@@ -61,7 +62,7 @@ public class DataTest {
 
     @Test
     public void testPutPOJO() {
-        final Person person = genPerson(1);
+        final Person person = genPerson(new Person(), 1);
         Paper.put("profile", person);
 
         final Person savedPerson = Paper.get("profile");

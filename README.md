@@ -1,13 +1,18 @@
 # Paper
 [![Build Status](https://travis-ci.org/pilgr/Paper.svg?branch=master)](https://travis-ci.org/pilgr/Paper) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Paper-blue.svg?style=flat)](http://android-arsenal.com/details/1/2080)
 
-Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets you save/restore Java objects by using efficient Kryo serialization and handling data structure changes automatically.
+Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets you save/restore Java/Kotlin objects using efficient Kryo serialization. Object structure changes handled automatically.
 
 ![Paper icon](/paper_icon.png)
 
+#### What's [new](/CHANGELOG.md) in 1.5
+* Save all the things! No more restriction to use classes only having no-arg constructor.
+* Custom serializers can be added using `Paper.addSerializer()`.
+* Kotlin is fully supported now, including saving `data class`es. Obviously saving lambdas is not supported.
+
 #### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:1.1'
+compile 'io.paperdb:paperdb:1.5'
 ```
 
 #### Initialize Paper
@@ -20,7 +25,7 @@ Paper.init(context);
 It's OK to call it in UI thread. All other methods should be used in background thread.
 
 #### Save
-Save data object. **Your custom classes must have no-arg constructor.**
+Save data object.
 Paper creates separate data file for each key.
 
 ```java

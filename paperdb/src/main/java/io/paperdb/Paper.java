@@ -4,6 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.esotericsoftware.kryo.Serializer;
+
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,6 +29,7 @@ public class Paper {
     private static Context mContext;
 
     private static final ConcurrentHashMap<String, Book> mBookMap = new ConcurrentHashMap<>();
+    private static final HashMap<Class, Serializer> mCustomSerializers = new HashMap<>();
 
     /**
      * Lightweight method to init Paper instance. Should be executed in {@link Application#onCreate()}
@@ -66,7 +70,7 @@ public class Paper {
         synchronized (mBookMap) {
             Book book = mBookMap.get(name);
             if (book == null) {
-                book = new Book(mContext, name);
+                book = new Book(mContext, name, mCustomSerializers);
                 mBookMap.put(name, book);
             }
             return book;
@@ -115,5 +119,18 @@ public class Paper {
     public static void clear(Context context) {
         init(context);
         book().destroy();
+    }
+    
+    /**
+     * Adds a custom serializer for a specific class
+     * When used, must be called right after Paper.init()
+     *
+     * @param clazz      type of the custom serializer
+     * @param serializer the serializer instance
+     * @param <T>        type of the serializer
+     */
+    public static <T> void addSerializer(Class<T> clazz, Serializer<T> serializer) {
+        if (!mCustomSerializers.containsKey(clazz))
+            mCustomSerializers.put(clazz, serializer);
     }
 }

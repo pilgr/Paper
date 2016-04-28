@@ -11,15 +11,23 @@ public class TestDataGenerator {
     public static List<Person> genPersonList(int size) {
         List<Person> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            Person p = genPerson(i);
+            Person p = genPerson(new Person(), i);
+            list.add(p);
+        }
+        return list;
+    }
+
+    public static List<PersonArg> genPersonArgList(int size) {
+        List<PersonArg> list = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            PersonArg p = genPerson(new PersonArg("name"), i);
             list.add(p);
         }
         return list;
     }
 
     @NonNull
-    public static Person genPerson(int i) {
-        Person p = new Person();
+    public static <T extends Person> T genPerson(T p, int i) {
         p.setAge(i);
         p.setBikes(new String[2]);
         p.getBikes()[0] = "Kellys gen#" + i;

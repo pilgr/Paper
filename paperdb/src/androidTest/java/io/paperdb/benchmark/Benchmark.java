@@ -15,6 +15,7 @@ import java.util.List;
 
 import io.paperdb.Paper;
 import io.paperdb.testdata.Person;
+import io.paperdb.testdata.PersonArg;
 import io.paperdb.testdata.TestDataGenerator;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
@@ -39,7 +40,12 @@ public class Benchmark extends AndroidTestCase {
         Hawk.clear();
         long hawkTime = runTest(new HawkReadWriteContactsTest(), contacts, REPEAT_COUNT);
 
-        printResults("Read/write 500 contacts", paperTime, hawkTime);
+        final List<PersonArg> contactsArg = TestDataGenerator.genPersonArgList(500);
+        Paper.init(getTargetContext());
+        Paper.book().destroy();
+        long paperArg = runTest(new PaperReadWriteContactsArgTest(), contactsArg, REPEAT_COUNT);
+
+        printResults("Read/write 500 contacts", paperTime, hawkTime, paperArg);
     }
 
     @Test
@@ -77,6 +83,12 @@ public class Benchmark extends AndroidTestCase {
                 name, paperTime, hawkTime));
     }
 
+    private void printResults(String name, long paperTime, long hawkTime, long paperArgTime) {
+        Log.i(TAG, String.format("..................................\n%s " +
+                "\n Paper: %d \n Paper(arg-cons): %d \n Hawk: %d",
+                name, paperTime, paperArgTime, hawkTime));
+    }
+
     private <T> long runTest(TestTask<T> task, T extra, int repeat) {
         long start = SystemClock.uptimeMillis();
         for (int i = 0; i < repeat; i++) {
@@ -92,6 +104,15 @@ public class Benchmark extends AndroidTestCase {
     private class PaperReadWriteContactsTest implements TestTask<List<Person>> {
         @Override
         public void run(int i, List<Person> extra) {
+            String key = "contacts" + i;
+            Paper.book().write(key, extra);
+            Paper.book().<List<Person>>read(key);
+        }
+    }
+
+    private class PaperReadWriteContactsArgTest implements TestTask<List<PersonArg>> {
+        @Override
+        public void run(int i, List<PersonArg> extra) {
             String key = "contacts" + i;
             Paper.book().write(key, extra);
             Paper.book().<List<Person>>read(key);
