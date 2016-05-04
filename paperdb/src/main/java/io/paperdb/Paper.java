@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.esotericsoftware.kryo.Serializer;
 
+import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -120,7 +121,13 @@ public class Paper {
         init(context);
         book().destroy();
     }
-    
+
+    public static void setLogLevel(int level) {
+        for (Map.Entry<String, Book> entry : mBookMap.entrySet()) {
+            entry.getValue().setLogLevel(level);
+        }
+    }
+
     /**
      * Adds a custom serializer for a specific class
      * When used, must be called right after Paper.init()

@@ -15,4 +15,6 @@ interface Storage {
     void deleteIfExists(String key);
 
     List<String> getAllKeys();
+
+    void setLogLevel(int level);
 }
