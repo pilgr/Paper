@@ -59,7 +59,7 @@ afterEvaluate {
 dependencies {
     compile 'com.esotericsoftware:kryo:3.0.2'
     compile 'de.javakaffee:kryo-serializers:0.33'
-    compile 'io.reactivex:rxjava:1.1.3'
+    optional 'io.reactivex:rxjava:1.1.3'
 
     androidTestCompile 'com.orhanobut:hawk:1.14'
     androidTestCompile 'com.android.support.test:runner:0.3'
