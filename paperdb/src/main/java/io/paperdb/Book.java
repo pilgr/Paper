@@ -5,6 +5,8 @@ import com.esotericsoftware.kryo.Serializer;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
+import rx.Observable;
 
 public class Book {
 
@@ -19,6 +21,16 @@ public class Book {
      */
     public void destroy() {
         mStorage.destroy();
+    }
+
+    public Observable<Boolean> destroyRx() {
+        return Observable.fromCallable(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                mStorage.destroy();
+                return true;
+            }
+        });
     }
 
     /**
@@ -38,6 +50,16 @@ public class Book {
         return this;
     }
 
+    public <T> Observable<Boolean> writeRx(final String key, final T value) {
+        return Observable.fromCallable(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                write(key, value);
+                return true;
+            }
+        });
+    }
+
     /**
      * Instantiates saved object using original object class (e.g. LinkedList). Support limited
      * backward and forward compatibility: removed fields are ignored, new fields have their
@@ -50,6 +72,10 @@ public class Book {
      */
     public <T> T read(String key) {
         return read(key, null);
+    }
+
+    public <T> Observable<T> readRx(String key) {
+        return readRx(key, null);
     }
 
     /**
@@ -68,6 +94,16 @@ public class Book {
         return value == null ? defaultValue : value;
     }
 
+    public <T> Observable<T> readRx(final String key, final T defaultValue) {
+        return Observable.fromCallable(new Callable<T>() {
+            @Override
+            public T call() throws Exception {
+                return read(key, defaultValue);
+            }
+        });
+    }
+
+
     /**
      * Check if an object with the given key is saved in Book storage.
      *
@@ -76,6 +112,15 @@ public class Book {
      */
     public boolean exist(String key) {
         return mStorage.exist(key);
+    }
+
+    public Observable<Boolean> existRx(final String key) {
+        return Observable.fromCallable(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return mStorage.exist(key);
+            }
+        });
     }
 
     /**
@@ -87,6 +132,16 @@ public class Book {
         mStorage.deleteIfExists(key);
     }
 
+    public Observable<Boolean> deleteRx(final String key) {
+        return Observable.fromCallable(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                mStorage.deleteIfExists(key);
+                return true;
+            }
+        });
+    }
+
     /**
      * Returns all keys for objects in book.
      *
@@ -96,4 +151,12 @@ public class Book {
         return mStorage.getAllKeys();
     }
 
+    public Observable<List<String>> getAllKeysRx() {
+        return Observable.fromCallable(new Callable<List<String>>() {
+            @Override
+            public List<String> call() throws Exception {
+                return getAllKeys();
+            }
+        });
+    }
 }
