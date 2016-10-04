@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 buildscript {
-    ext.kotlin_version = '1.0.1-2'
+    ext.kotlin_version = '1.0.4'
     repositories {
         mavenCentral()
     }
@@ -15,12 +15,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 21
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
 
@@ -58,11 +58,11 @@ afterEvaluate {
 
 dependencies {
     compile 'com.esotericsoftware:kryo:3.0.2'
-    compile 'de.javakaffee:kryo-serializers:0.33'
 
     androidTestCompile 'com.orhanobut:hawk:1.14'
     androidTestCompile 'com.android.support.test:runner:0.3'
     androidTestCompile 'com.squareup.assertj:assertj-android:1.0.0'
+    androidTestCompile 'de.javakaffee:kryo-serializers:0.33'
     androidTestCompile 'joda-time:joda-time:2.9.1'
     androidTestCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
