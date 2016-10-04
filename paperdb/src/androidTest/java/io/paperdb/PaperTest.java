@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
-import de.javakaffee.kryoserializers.jodatime.JodaDateTimeSerializer;
 import io.paperdb.testdata.TestDataGenerator;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
