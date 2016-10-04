@@ -24,11 +24,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import de.javakaffee.kryoserializers.ArraysAsListSerializer;
-import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
-import de.javakaffee.kryoserializers.UUIDSerializer;
-import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
+import io.paperdb.serializer.ArraysAsListSerializer;
 import io.paperdb.serializer.NoArgCollectionSerializer;
+import io.paperdb.serializer.SynchronizedCollectionsSerializer;
+import io.paperdb.serializer.UUIDSerializer;
+import io.paperdb.serializer.UnmodifiableCollectionsSerializer;
 
 import static io.paperdb.Paper.TAG;
 
