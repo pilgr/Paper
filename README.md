@@ -12,7 +12,7 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 
 #### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:1.5'
+compile 'io.paperdb:paperdb:2.0-rc1'
 ```
 
 #### Initialize Paper
