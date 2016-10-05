@@ -248,13 +248,7 @@ public class DbStoragePlainFile implements Storage {
                 }
             }
             String errorMessage = "Couldn't read/deserialize file "
-                    + originalFile + " for table " + key;
-            if (e.getMessage().startsWith("Class cannot be created (missing no-arg constructor): ")){
-                String className = e.getMessage()
-                        .replace("Class cannot be created (missing no-arg constructor):", "");
-                errorMessage = "You have to add a public no-arg constructor for the class" + className
-                + "\n Read more: https://github.com/pilgr/Paper#save";
-            }
+                  + originalFile + " for table " + key;
             throw new PaperDbException(errorMessage, e);
         }
     }
