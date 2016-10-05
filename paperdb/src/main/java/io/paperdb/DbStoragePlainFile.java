@@ -73,7 +73,7 @@ public class DbStoragePlainFile implements Storage {
 
         // UUID support
         kryo.register(UUID.class, new UUIDSerializer());
-        
+
         for (Class<?> clazz : mCustomSerializers.keySet())
             kryo.register(clazz, mCustomSerializers.get(clazz));
 
@@ -232,14 +232,30 @@ public class DbStoragePlainFile implements Storage {
     }
 
     private <E> E readTableFile(String key, File originalFile) {
+        return readTableFile(key, originalFile, false);
+    }
+
+    private <E> E readTableFile(String key, File originalFile,
+                                boolean v1CompatibilityMode) {
         try {
             final Input i = new Input(new FileInputStream(originalFile));
             final Kryo kryo = getKryo();
+            if (v1CompatibilityMode) {
+                // Set temporary generic optimization to support Kryo 3.x format
+                kryo.getFieldSerializerConfig().setOptimizedGenerics(true);
+            }
             //noinspection unchecked
             final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
             i.close();
+            if (v1CompatibilityMode) {
+                kryo.getFieldSerializerConfig().setOptimizedGenerics(false);
+            }
             return paperTable.mContent;
-        } catch (FileNotFoundException | KryoException e) {
+        } catch (FileNotFoundException | KryoException | ClassCastException e) {
+            // Give one more chance, reread data in compatibility mode
+            if (!v1CompatibilityMode) {
+                return readTableFile(key, originalFile, true);
+            }
             // Clean up an unsuccessfully written file
             if (originalFile.exists()) {
                 if (!originalFile.delete()) {
@@ -248,7 +264,7 @@ public class DbStoragePlainFile implements Storage {
                 }
             }
             String errorMessage = "Couldn't read/deserialize file "
-                  + originalFile + " for table " + key;
+                    + originalFile + " for table " + key;
             throw new PaperDbException(errorMessage, e);
         }
     }
