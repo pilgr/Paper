@@ -5,14 +5,14 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 
 ![Paper icon](/paper_icon.png)
 
-### What's [new](/CHANGELOG.md) in 1.5
-* Save all the things! No more restriction to use classes only having no-arg constructor.
-* Custom serializers can be added using `Paper.addSerializer()`.
-* Kotlin is fully supported now, including saving `data class`es. Obviously saving lambdas is not supported.
+### What's [new](/CHANGELOG.md) in 2.0
+* Update internal Kryo serializer to 4.0. The data format is changed, but Paper supports backward data compatibility automatically;
+* Now 58% less methods count : [4037](http://www.methodscount.com/?lib=io.paperdb%3Apaperdb%3A2.0);
+* Depends on data structure you may experience faster reading but slower writing.
 
 ### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:1.5'
+compile 'io.paperdb:paperdb:2.0'
 ```
 
 ### Initialize Paper

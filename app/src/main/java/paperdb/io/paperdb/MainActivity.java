@@ -4,14 +4,48 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+
+import java.util.List;
+
+import io.paperdb.Paper;
+
+import static java.util.Arrays.asList;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String PERSON = "person";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Paper.init(this);
+
+        findViewById(R.id.test_write).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LongHolder o1 = new LongHolder(12L);
+                LongListHolder o2 = new LongListHolder(asList(23L));
+                Paper.book().write("o1", o1);
+                Paper.book().write("o2", o2);
+            }
+        });
+
+        final Button btnRead = (Button) findViewById(R.id.test_read);
+
+        btnRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LongHolder o1 = Paper.book().read("o1", new LongHolder(-1L));
+                LongListHolder o2 = Paper.book().read("o2", new LongListHolder(asList(-1L)));
+
+                btnRead.setText("Read: " + o1.getValue() + " : " + o2.getValue().get(0));
+            }
+        });
     }
 
     @Override
@@ -34,5 +68,48 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public static class Person {
+        final String name;
+
+        Person(String name) {
+            this.name = name;
+        }
+    }
+
+    interface Holder<V> {
+        V getValue();
+    }
+
+    static abstract class AbstractValueHolder<V> implements Holder<V> {
+        private final V value;
+
+        AbstractValueHolder(V value) {
+            this.value = value;
+        }
+
+        @Override
+        public V getValue() {
+            return value;
+        }
+    }
+
+    static abstract class AbstractValueListHolder<V> extends AbstractValueHolder<List<V>> {
+        AbstractValueListHolder(List<V> value) {
+            super(value);
+        }
+    }
+
+    static class LongHolder extends AbstractValueHolder<Long> {
+        LongHolder(Long value) {
+            super(value);
+        }
+    }
+
+    static class LongListHolder extends AbstractValueListHolder<Long> {
+        LongListHolder(List<Long> value) {
+            super(value);
+        }
     }
 }
