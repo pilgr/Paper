@@ -22,5 +22,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile project(':paperdb')
-    //compile 'io.paperdb:paperdb:1.5'
+    compile 'io.paperdb:paperdb:2.0-rc1'
 }
