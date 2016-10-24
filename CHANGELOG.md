@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+Version 2.0 *(2016-10-24)*
+----------------------------
+
+* Update internal Kryo serializer to 4.0. The data format is changed, but Paper supports backward data compatibility automatically;
+* Now 58% less methods count : [4037](http://www.methodscount.com/?lib=io.paperdb%3Apaperdb%3A2.0);
+* Depends on data structure you may experience faster reading but slower writing.
+
+
 Version 1.5 *(2016-04-28)*
 ----------------------------
 
