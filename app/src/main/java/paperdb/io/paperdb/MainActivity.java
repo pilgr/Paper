@@ -1,14 +1,20 @@
 package paperdb.io.paperdb;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import io.objectbox.Box;
+import io.objectbox.BoxStore;
 import io.paperdb.Paper;
 
 import static java.util.Arrays.asList;
@@ -46,6 +52,59 @@ public class MainActivity extends AppCompatActivity {
                 btnRead.setText("Read: " + o1.getValue() + " : " + o2.getValue().get(0));
             }
         });
+
+        findViewById(R.id.test_write_benchmark).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                runWriteBenchmark();
+            }
+        });
+
+        findViewById(R.id.test_read_benchmark).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                runReadBenchmark();
+            }
+        });
+    }
+
+    private List<Note> generate500Notes() {
+        List<Note> notes = new ArrayList<>();
+        for (int i = 0; i < 500; i++) {
+            notes.add(new Note("This is a note #" + i, new Date()));
+        }
+        return notes;
+    }
+
+    private void runWriteBenchmark() {
+        List<Note> notes = generate500Notes();
+
+        BoxStore box = MyObjectBox.builder().androidContext(this).build();
+        Box<Note> notesBox = box.boxFor(Note.class);
+        notesBox.removeAll();
+
+        long objboxStart = SystemClock.uptimeMillis();
+        notesBox.put(notes);
+        Log.d("BENCHMARK", "Write ObjectBox: " + (SystemClock.uptimeMillis() - objboxStart) + "ms");
+
+        Paper.init(this);
+
+        long paperStart = SystemClock.uptimeMillis();
+        Paper.book().write("notes", notes);
+        Log.d("BENCHMARK", "Write Paper: " + (SystemClock.uptimeMillis() - paperStart) + "ms");
+    }
+
+    private void runReadBenchmark() {
+        Paper.init(this);
+
+        long objboxStart = SystemClock.uptimeMillis();
+        BoxStore box = MyObjectBox.builder().androidContext(this).build();
+        Box<Note> notesBox = box.boxFor(Note.class);
+        Log.d("BENCHMARK", "Read ObjectBox" + notesBox.getAll().size() + ": " + (SystemClock.uptimeMillis() - objboxStart) + "ms");
+
+        long paperStart = SystemClock.uptimeMillis();
+        List<Note> paperReadNotes = Paper.book().read("notes");
+        Log.d("BENCHMARK", "Read Paper" + paperReadNotes.size() + ": " + (SystemClock.uptimeMillis() - paperStart) + "ms");
     }
 
     @Override

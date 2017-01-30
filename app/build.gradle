@@ -1,4 +1,24 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "http://objectbox.net/beta-repo/"
+        }
+    }
+    dependencies {
+        classpath 'io.objectbox:objectbox-gradle-plugin:0.9.6'
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'io.objectbox'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://objectbox.net/beta-repo/"
+    }
+}
 
 android {
     compileSdkVersion 24
@@ -23,4 +43,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile project(':paperdb')
     compile 'io.paperdb:paperdb:2.0-rc1'
+    compile 'io.objectbox:objectbox-android:0.9.6'
 }
