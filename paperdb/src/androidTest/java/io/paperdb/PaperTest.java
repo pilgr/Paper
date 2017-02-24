@@ -18,6 +18,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 @RunWith(AndroidJUnit4.class)
 public class PaperTest {
@@ -179,5 +180,26 @@ public class PaperTest {
         DateTime now = DateTime.now(DateTimeZone.UTC);
         Paper.book("custom").write("joda-datetime", now);
         assertEquals(Paper.book("custom").read("joda-datetime"), now);
+    }
+
+    @Test
+    public void testTimestampNoObject() {
+        Paper.book().destroy();
+        long timestamp = Paper.book().lastModified("city");
+        assertEquals(-1, timestamp);
+    }
+
+    @Test
+    public void testTimestamp() {
+        long testStartMS = System.currentTimeMillis();
+
+        Paper.book().destroy();
+        Paper.book().write("city", "Lund");
+
+        long fileWriteMS = Paper.book().lastModified("city");
+        assertNotEquals(-1, fileWriteMS);
+
+        long elapsed = fileWriteMS - testStartMS;
+        assertThat(elapsed >= 0).isTrue();
     }
 }

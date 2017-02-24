@@ -79,10 +79,10 @@ public class Book {
     }
 
     /**
-     * Return lastModified timestamp of last write
+     * Returns lastModified timestamp of last write
      *
      * @param key object key
-     * @returns timestamp of last write for given key if it exists, otherwise -1
+     * @return timestamp of last write for given key if it exists, otherwise -1
      */
     public long lastModified(String key){
         return mStorage.lastModified(key);
