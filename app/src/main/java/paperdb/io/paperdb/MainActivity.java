@@ -2,6 +2,7 @@ package paperdb.io.paperdb;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import static java.util.Arrays.asList;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     public static final String PERSON = "person";
 
     @Override
@@ -42,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LongHolder o1 = Paper.book().read("o1", new LongHolder(-1L));
                 LongListHolder o2 = Paper.book().read("o2", new LongListHolder(asList(-1L)));
+
+                long lastModified = Paper.book().lastModified("o1");
+                Log.d(TAG, "lastModified: " + lastModified);
 
                 btnRead.setText("Read: " + o1.getValue() + " : " + o2.getValue().get(0));
             }

@@ -12,6 +12,8 @@ interface Storage {
 
     boolean exist(String key);
 
+    long lastModified(String key);
+
     void deleteIfExists(String key);
 
     List<String> getAllKeys();

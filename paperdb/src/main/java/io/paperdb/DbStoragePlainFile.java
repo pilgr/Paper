@@ -156,6 +156,13 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
+    public synchronized long lastModified(String key) {
+        assertInit();
+        final File originalFile = getOriginalFile(key);
+        return originalFile.lastModified();
+    }
+
+    @Override
     public List<String> getAllKeys() {
         assertInit();
 
