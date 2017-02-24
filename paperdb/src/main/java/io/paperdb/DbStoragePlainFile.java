@@ -158,8 +158,9 @@ public class DbStoragePlainFile implements Storage {
     @Override
     public synchronized long lastModified(String key) {
         assertInit();
+
         final File originalFile = getOriginalFile(key);
-        return originalFile.lastModified();
+        return originalFile.exists() ? originalFile.lastModified() : -1;
     }
 
     @Override
