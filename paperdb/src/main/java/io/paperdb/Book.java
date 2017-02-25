@@ -79,6 +79,16 @@ public class Book {
     }
 
     /**
+     * Returns lastModified timestamp of last write
+     *
+     * @param key object key
+     * @return timestamp of last write for given key if it exists, otherwise -1
+     */
+    public long lastModified(String key){
+        return mStorage.lastModified(key);
+    }
+
+    /**
      * Delete saved object for given key if it is exist.
      *
      * @param key object key
