@@ -39,6 +39,7 @@ public class DbStoragePlainFile implements Storage {
     private final HashMap<Class, Serializer> mCustomSerializers;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
+    private KeyLocker keyLocker = new KeyLocker();
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -102,53 +103,76 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
-    public synchronized <E> void insert(String key, E value) {
-        assertInit();
+    public <E> void insert(String key, E value) {
+        try {
+            keyLocker.acquire(key);
+            assertInit();
 
-        final PaperTable<E> paperTable = new PaperTable<>(value);
+            final PaperTable<E> paperTable = new PaperTable<>(value);
 
-        final File originalFile = getOriginalFile(key);
-        final File backupFile = makeBackupFile(originalFile);
-        // Rename the current file so it may be used as a backup during the next read
-        if (originalFile.exists()) {
-            //Rename original to backup
-            if (!backupFile.exists()) {
-                if (!originalFile.renameTo(backupFile)) {
-                    throw new PaperDbException("Couldn't rename file " + originalFile
-                            + " to backup file " + backupFile);
+            final File originalFile = getOriginalFile(key);
+            final File backupFile = makeBackupFile(originalFile);
+            // Rename the current file so it may be used as a backup during the next read
+            if (originalFile.exists()) {
+                //Rename original to backup
+                if (!backupFile.exists()) {
+                    if (!originalFile.renameTo(backupFile)) {
+                        throw new PaperDbException("Couldn't rename file " + originalFile
+                                + " to backup file " + backupFile);
+                    }
+                } else {
+                    //Backup exist -> original file is broken and must be deleted
+                    //noinspection ResultOfMethodCallIgnored
+                    originalFile.delete();
                 }
-            } else {
-                //Backup exist -> original file is broken and must be deleted
-                //noinspection ResultOfMethodCallIgnored
-                originalFile.delete();
+            }
+
+            writeTableFile(key, paperTable, originalFile, backupFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                keyLocker.release(key);
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
-
-        writeTableFile(key, paperTable, originalFile, backupFile);
     }
 
     @Override
-    public synchronized <E> E select(String key) {
-        assertInit();
+    public <E> E select(String key) {
+        try {
+            keyLocker.acquire(key);
+            assertInit();
 
-        final File originalFile = getOriginalFile(key);
-        final File backupFile = makeBackupFile(originalFile);
-        if (backupFile.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            originalFile.delete();
-            //noinspection ResultOfMethodCallIgnored
-            backupFile.renameTo(originalFile);
-        }
+            final File originalFile = getOriginalFile(key);
+            final File backupFile = makeBackupFile(originalFile);
+            if (backupFile.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                originalFile.delete();
+                //noinspection ResultOfMethodCallIgnored
+                backupFile.renameTo(originalFile);
+            }
 
-        if (!exist(key)) {
+            if (!exist(key)) {
+                return null;
+            }
+
+            return readTableFile(key, originalFile);
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
+        } finally {
+            try {
+                keyLocker.release(key);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
-
-        return readTableFile(key, originalFile);
     }
 
     @Override
-    public synchronized boolean exist(String key) {
+    public boolean exist(String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -173,18 +197,29 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
-    public synchronized void deleteIfExists(String key) {
-        assertInit();
+    public void deleteIfExists(String key) {
+        try {
+            keyLocker.acquire(key);
+            assertInit();
 
-        final File originalFile = getOriginalFile(key);
-        if (!originalFile.exists()) {
-            return;
-        }
+            final File originalFile = getOriginalFile(key);
+            if (!originalFile.exists()) {
+                return;
+            }
 
-        boolean deleted = originalFile.delete();
-        if (!deleted) {
-            throw new PaperDbException("Couldn't delete file " + originalFile
-                    + " for table " + key);
+            boolean deleted = originalFile.delete();
+            if (!deleted) {
+                throw new PaperDbException("Couldn't delete file " + originalFile
+                        + " for table " + key);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                keyLocker.release(key);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
