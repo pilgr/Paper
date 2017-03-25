@@ -1,6 +1,7 @@
 package io.paperdb;
 
 import android.content.Context;
+
 import com.esotericsoftware.kryo.Serializer;
 
 import java.util.HashMap;
@@ -76,6 +77,18 @@ public class Book {
      */
     public boolean exist(String key) {
         return mStorage.exist(key);
+    }
+
+    /**
+     * Returns lastModified timestamp of last write in ms.
+     * NOTE: only seconds granularity is guaranteed as many file system don't support
+     * milliseconds granularity for file's last-modification time
+     *
+     * @param key object key
+     * @return timestamp of last write for given key in ms if it exists, otherwise -1
+     */
+    public long lastModified(String key){
+        return mStorage.lastModified(key);
     }
 
     /**

@@ -1,5 +1,6 @@
 package io.paperdb;
 
+import android.os.SystemClock;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.joda.time.DateTime;
@@ -18,6 +19,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 @RunWith(AndroidJUnit4.class)
 public class PaperTest {
@@ -119,13 +121,13 @@ public class PaperTest {
         assertThat(Paper.book().read("city-ads")).isEqualTo("Lund");
     }
 
-    @Test(expected=PaperDbException.class)
+    @Test(expected = PaperDbException.class)
     public void testInvalidKeyNameBackslash() {
         Paper.book().write("city/ads", "Lund");
         assertThat(Paper.book().read("city/ads")).isEqualTo("Lund");
     }
 
-    @Test(expected=PaperDbException.class)
+    @Test(expected = PaperDbException.class)
     public void testGetBookWithDefaultBookName() {
         Paper.book(Paper.DEFAULT_DB_NAME);
     }
@@ -180,4 +182,42 @@ public class PaperTest {
         Paper.book("custom").write("joda-datetime", now);
         assertEquals(Paper.book("custom").read("joda-datetime"), now);
     }
+
+    @Test
+    public void testTimestampNoObject() {
+        Paper.book().destroy();
+        long timestamp = Paper.book().lastModified("city");
+        assertEquals(-1, timestamp);
+    }
+
+    @Test
+    public void testTimestamp() {
+        long testStartMS = System.currentTimeMillis();
+
+        Paper.book().destroy();
+        Paper.book().write("city", "Lund");
+
+        long fileWriteMS = Paper.book().lastModified("city");
+        assertNotEquals(-1, fileWriteMS);
+
+        long elapsed = fileWriteMS - testStartMS;
+        // Many file systems only support seconds granularity for last-modification time
+        assertThat(elapsed < 1000 || elapsed > -1000).isTrue();
+    }
+
+    @Test
+    public void testTimestampChanges() {
+        Paper.book().destroy();
+        Paper.book().write("city", "Lund");
+        long fileWrite1MS = Paper.book().lastModified("city");
+
+        // Add 1 sec delay as many file systems only support seconds granularity for last-modification time
+        SystemClock.sleep(1000);
+
+        Paper.book().write("city", "Kyiv");
+        long fileWrite2MS = Paper.book().lastModified("city");
+
+        assertThat(fileWrite2MS > fileWrite1MS).isTrue();
+    }
+
 }
