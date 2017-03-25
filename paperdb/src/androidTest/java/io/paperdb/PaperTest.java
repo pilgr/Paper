@@ -1,5 +1,6 @@
 package io.paperdb;
 
+import android.os.SystemClock;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.joda.time.DateTime;
@@ -120,13 +121,13 @@ public class PaperTest {
         assertThat(Paper.book().read("city-ads")).isEqualTo("Lund");
     }
 
-    @Test(expected=PaperDbException.class)
+    @Test(expected = PaperDbException.class)
     public void testInvalidKeyNameBackslash() {
         Paper.book().write("city/ads", "Lund");
         assertThat(Paper.book().read("city/ads")).isEqualTo("Lund");
     }
 
-    @Test(expected=PaperDbException.class)
+    @Test(expected = PaperDbException.class)
     public void testGetBookWithDefaultBookName() {
         Paper.book(Paper.DEFAULT_DB_NAME);
     }
@@ -200,6 +201,23 @@ public class PaperTest {
         assertNotEquals(-1, fileWriteMS);
 
         long elapsed = fileWriteMS - testStartMS;
-        assertThat(elapsed >= 0).isTrue();
+        // Many file systems only support seconds granularity for last-modification time
+        assertThat(elapsed < 1000 || elapsed > -1000).isTrue();
     }
+
+    @Test
+    public void testTimestampChanges() {
+        Paper.book().destroy();
+        Paper.book().write("city", "Lund");
+        long fileWrite1MS = Paper.book().lastModified("city");
+
+        // Add 1 sec delay as many file systems only support seconds granularity for last-modification time
+        SystemClock.sleep(1000);
+
+        Paper.book().write("city", "Kyiv");
+        long fileWrite2MS = Paper.book().lastModified("city");
+
+        assertThat(fileWrite2MS > fileWrite1MS).isTrue();
+    }
+
 }
