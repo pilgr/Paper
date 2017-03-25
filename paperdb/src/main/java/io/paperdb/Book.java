@@ -109,6 +109,11 @@ public class Book {
         return mStorage.getAllKeys();
     }
 
+    /**
+     * Sets log level for internal Kryo serializer
+     *
+     * @param level one of levels from {@link com.esotericsoftware.minlog.Log }
+     */
     public void setLogLevel(int level) {
         mStorage.setLogLevel(level);
     }

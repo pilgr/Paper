@@ -6,8 +6,8 @@ import android.os.Bundle;
 
 import com.esotericsoftware.kryo.Serializer;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -122,6 +122,11 @@ public class Paper {
         book().destroy();
     }
 
+    /**
+     *  Sets log level for internal Kryo serializer
+     *
+     * @param level one of levels from {@link com.esotericsoftware.minlog.Log }
+     */
     public static void setLogLevel(int level) {
         for (Map.Entry<String, Book> entry : mBookMap.entrySet()) {
             entry.getValue().setLogLevel(level);
