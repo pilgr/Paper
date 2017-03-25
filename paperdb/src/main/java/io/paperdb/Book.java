@@ -109,4 +109,8 @@ public class Book {
         return mStorage.getAllKeys();
     }
 
+    public void setLogLevel(int level) {
+        mStorage.setLogLevel(level);
+    }
+
 }

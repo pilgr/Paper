@@ -196,6 +196,11 @@ public class DbStoragePlainFile implements Storage {
         }
     }
 
+    @Override
+    public void setLogLevel(int level) {
+        com.esotericsoftware.minlog.Log.set(level);
+    }
+
     private File getOriginalFile(String key) {
         final String tablePath = mFilesDir + File.separator + key + ".pt";
         return new File(tablePath);
