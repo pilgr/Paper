@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 2.1 *(2017-06-01)*
+----------------------------
+
+* #40: Allow logging kryo marshalling;
+* Add `Book.lastModified()` for given key to return timestamp of last update;
+* #58: Fix warning on read data on Android N+;
+
 Version 2.0 *(2016-10-24)*
 ----------------------------
 
