@@ -5,14 +5,14 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 
 ![Paper icon](/paper_icon.png)
 
-### What's [new](/CHANGELOG.md) in 2.0
-* Update internal Kryo serializer to 4.0. The data format is changed, but Paper supports backward data compatibility automatically;
-* Now 58% less methods count : [4037](http://www.methodscount.com/?lib=io.paperdb%3Apaperdb%3A2.0);
-* Depends on data structure you may experience faster reading but slower writing.
+### What's [new](/CHANGELOG.md) in 2.1
+* Allow logging kryo marshalling;
+* Add `Book.lastModified()` for given key to return timestamp of last update;
+* Fix warning on read data on Android N+;
 
 ### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:2.0'
+compile 'io.paperdb:paperdb:2.1'
 ```
 
 ### Initialize Paper
@@ -139,7 +139,7 @@ Running [Benchmark](https://github.com/pilgr/Paper/blob/master/paperdb/src/andro
 | Read 500 contacts         | 79       | 155      |          |
 
 ### Limitations
-* Circular references not supported
+* Circular references is not supported
 
 ### Apps using Paper
 - [AppDialer](https://play.google.com/store/apps/details?id=name.pilgr.appdialer) – Paper _initially_ has been developed to reduce start up time for AppDialer. Currently AppDialer has the best start up time in its class. And simple no-sql-pain data storage layer like a bonus.
