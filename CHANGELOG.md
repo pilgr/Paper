@@ -4,9 +4,12 @@ Change Log
 Version 2.1 *(2017-06-01)*
 ----------------------------
 
-* #40: Allow logging kryo marshalling;
-* Add `Book.lastModified()` for given key to return timestamp of last update;
-* #58: Fix warning on read data on Android N+;
+* Get timestamp of last update using `book.lastModified(key)`;
+* Set log level for internal Kryo serializer using `Paper.setLogLevel()` or `book.setLogLevel()` ;
+* Fixed warning on read data on Android N+;
+
+
+Thanks @aaronpoweruser and @fiskurgit for contrib!
 
 Version 2.0 *(2016-10-24)*
 ----------------------------
