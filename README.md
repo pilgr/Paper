@@ -6,9 +6,11 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 ![Paper icon](/paper_icon.png)
 
 ### What's [new](/CHANGELOG.md) in 2.1
-* Allow logging kryo marshalling;
-* Add `Book.lastModified()` for given key to return timestamp of last update;
-* Fix warning on read data on Android N+;
+* Get timestamp of last update using `book.lastModified(key)`;
+* Set log level for internal Kryo serializer using `Paper.setLogLevel()` or `book.setLogLevel()` ;
+* Fixed warning on read data on Android N+;
+
+Thanks @aaronpoweruser and @fiskurgit for contrib!
 
 ### Add dependency
 ```groovy
