@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.5 *(2017-09-21)*
+----------------------------
+
+* Fix crash on data migration when switching lib from 1.x to 2.x
+* Do not remove data file after failed read attempt (don't consider file broken). 
+
 Version 2.1 *(2017-06-01)*
 ----------------------------
 
