@@ -5,12 +5,16 @@ Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets y
 
 ![Paper icon](/paper_icon.png)
 
-# I strongly recommend updating Paper to version 2.1 to avoid data corruption on Android N+!
+# The update contains critical fixes, please update Paper to version 2.5 ASAP!
+
+### What's [new](/CHANGELOG.md) in 2.5
+* (!) Fixed crash on data migration when switching lib from 1.x to 2.x
+* (!) Fixed possible data loss on failed read attempt. 
 
 ### What's [new](/CHANGELOG.md) in 2.1
+* (!) Fixed exception causing data corruption on Android N+ (happens if targetSdkVersion=25+);
 * Get timestamp of last update using `book.lastModified(key)`;
 * Set log level for internal Kryo serializer using `Paper.setLogLevel()` or `book.setLogLevel()` ;
-* Fixed exception causing data corruption on Android N+ (happens if targetSdkVersion=25+);
 
 Thanks @aaronpoweruser and @fiskurgit for contrib!
 

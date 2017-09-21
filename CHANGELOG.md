@@ -1,12 +1,18 @@
 Change Log
 ==========
 
+Version 2.5 *(2017-09-21)*
+----------------------------
+
+* (!) Fixed crash on data migration when switching lib from 1.x to 2.x
+* (!) Fixed possible data loss on failed read attempt. 
+
 Version 2.1 *(2017-06-01)*
 ----------------------------
 
 * Get timestamp of last update using `book.lastModified(key)`;
 * Set log level for internal Kryo serializer using `Paper.setLogLevel()` or `book.setLogLevel()` ;
-* Fixed warning on read data on Android N+;
+* (!) Fixed exception on read data on Android N+;
 
 
 Thanks @aaronpoweruser and @fiskurgit for contrib!
