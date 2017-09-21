@@ -57,12 +57,8 @@ afterEvaluate {
 }
 
 dependencies {
-    compile 'com.esotericsoftware:kryo:4.0.0'
+    compile 'com.esotericsoftware:kryo:4.0.1'
     compile 'de.javakaffee:kryo-serializers:0.40'
-    // Force update Objenesis version from 2.2->2.3 to fix warning on instantiating
-    // class on Android N+. Originally Kryo 4.0.0 depends on objenesis 2.2.
-    // https://github.com/pilgr/Paper/issues/58
-    compile 'org.objenesis:objenesis:2.3'
 
     androidTestCompile 'com.orhanobut:hawk:1.14'
     androidTestCompile 'com.android.support.test:runner:0.5'
