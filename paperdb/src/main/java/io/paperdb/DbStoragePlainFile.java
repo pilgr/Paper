@@ -87,8 +87,8 @@ public class DbStoragePlainFile implements Storage {
         return kryo;
     }
 
-    public DbStoragePlainFile(Context context, String dbName,
-                              HashMap<Class, Serializer> serializers) {
+    DbStoragePlainFile(Context context, String dbName,
+                       HashMap<Class, Serializer> serializers) {
         mContext = context;
         mDbName = dbName;
         mCustomSerializers = serializers;
@@ -261,14 +261,6 @@ public class DbStoragePlainFile implements Storage {
                     exception = compatibleReadException;
                 }
             }
-            // TODO Delete this
-            // Clean up an unsuccessfully written file
-            if (originalFile.exists()) {
-                if (!originalFile.delete()) {
-                    throw new PaperDbException("Couldn't clean up broken/unserializable file "
-                            + originalFile, exception);
-                }
-            }
             String errorMessage = "Couldn't read/deserialize file "
                     + originalFile + " for table " + key;
             throw new PaperDbException(errorMessage, exception);
@@ -334,16 +326,14 @@ public class DbStoragePlainFile implements Storage {
      * Perform an fsync on the given FileOutputStream.  The stream at this
      * point must be flushed but not yet closed.
      */
-    private static boolean sync(FileOutputStream stream) {
+    private static void sync(FileOutputStream stream) {
         //noinspection EmptyCatchBlock
         try {
             if (stream != null) {
                 stream.getFD().sync();
             }
-            return true;
         } catch (IOException e) {
         }
-        return false;
     }
 }
 

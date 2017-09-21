@@ -9,10 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.List;
 
 import de.javakaffee.kryoserializers.jodatime.JodaDateTimeSerializer;
 import io.paperdb.testdata.TestDataGenerator;
+import io.paperdb.utils.TestUtils;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static junit.framework.Assert.assertEquals;
@@ -20,6 +22,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class PaperTest {
@@ -218,6 +221,25 @@ public class PaperTest {
         long fileWrite2MS = Paper.book().lastModified("city");
 
         assertThat(fileWrite2MS > fileWrite1MS).isTrue();
+    }
+
+    @Test
+    public void testDbFileExistsAfterFailedRead() throws IOException {
+        String key = "cityMap";
+        assertFalse(Paper.book().exist(key));
+
+        TestUtils.replacePaperDbFileBy("invalid_data.pt", key);
+        assertTrue(Paper.book().exist(key));
+
+        Throwable expectedException = null;
+        try {
+            Paper.book().read(key);
+        } catch (PaperDbException e) {
+            expectedException = e;
+        }
+        assertNotNull(expectedException);
+        // Data file should exist even if previous read attempt was failed
+        assertTrue(Paper.book().exist(key));
     }
 
 }
