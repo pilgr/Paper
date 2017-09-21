@@ -47,12 +47,16 @@ public class DbStoragePlainFile implements Storage {
     private final ThreadLocal<Kryo> mKryo = new ThreadLocal<Kryo>() {
         @Override
         protected Kryo initialValue() {
-            return createKryoInstance();
+            return createKryoInstance(false);
         }
     };
 
-    private Kryo createKryoInstance() {
+    private Kryo createKryoInstance(boolean compatibilityMode) {
         Kryo kryo = new Kryo();
+
+        if (compatibilityMode) {
+            kryo.getFieldSerializerConfig().setOptimizedGenerics(true);
+        }
 
         kryo.register(PaperTable.class);
         kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
@@ -245,40 +249,41 @@ public class DbStoragePlainFile implements Storage {
     }
 
     private <E> E readTableFile(String key, File originalFile) {
-        return readTableFile(key, originalFile, false);
-    }
-
-    private <E> E readTableFile(String key, File originalFile,
-                                boolean v1CompatibilityMode) {
         try {
-            final Input i = new Input(new FileInputStream(originalFile));
-            final Kryo kryo = getKryo();
-            if (v1CompatibilityMode) {
-                // Set temporary generic optimization to support Kryo 3.x format
-                kryo.getFieldSerializerConfig().setOptimizedGenerics(true);
-            }
-            //noinspection unchecked
-            final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
-            i.close();
-            if (v1CompatibilityMode) {
-                kryo.getFieldSerializerConfig().setOptimizedGenerics(false);
-            }
-            return paperTable.mContent;
+            return readContent(originalFile, getKryo());
         } catch (FileNotFoundException | KryoException | ClassCastException e) {
-            // Give one more chance, reread data in compatibility mode
-            if (!v1CompatibilityMode) {
-                return readTableFile(key, originalFile, true);
+            Throwable exception = e;
+            // Give one more chance, read data in paper 1.x compatibility mode
+            if (e instanceof KryoException) {
+                try {
+                    return readContent(originalFile, createKryoInstance(true));
+                } catch (FileNotFoundException | KryoException | ClassCastException compatibleReadException) {
+                    exception = compatibleReadException;
+                }
             }
+            // TODO Delete this
             // Clean up an unsuccessfully written file
             if (originalFile.exists()) {
                 if (!originalFile.delete()) {
                     throw new PaperDbException("Couldn't clean up broken/unserializable file "
-                            + originalFile, e);
+                            + originalFile, exception);
                 }
             }
             String errorMessage = "Couldn't read/deserialize file "
                     + originalFile + " for table " + key;
-            throw new PaperDbException(errorMessage, e);
+            throw new PaperDbException(errorMessage, exception);
+        }
+    }
+
+    private <E> E readContent(File originalFile, Kryo kryo) throws FileNotFoundException, KryoException {
+        final Input i = new Input(new FileInputStream(originalFile));
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            //noinspection unchecked
+            final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
+            return paperTable.mContent;
+        } finally {
+            i.close();
         }
     }
 

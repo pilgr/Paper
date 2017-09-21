@@ -28,7 +28,7 @@ public class VersionUpgradeTest {
     public void testWrite() {
         Recipe recipe = new Recipe();
         recipe.name = "chocolate cake";
-        recipe.ingredients = new HashMap<String, Integer>();
+        recipe.ingredients = new HashMap<>();
         recipe.ingredients.put("flour", 300);
         recipe.ingredients.put("eggs", 4);
         recipe.ingredients.put("chocolate", 200);
@@ -41,6 +41,7 @@ public class VersionUpgradeTest {
     public void testRead() throws IOException {
         File filesDir = new File(getTargetContext().getFilesDir(), "io.paperdb");
         if (!filesDir.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             filesDir.mkdirs();
         }
 
@@ -51,13 +52,12 @@ public class VersionUpgradeTest {
 
         Recipe recipe = Paper.book().read("recipe");
         assertThat(recipe.name).isEqualTo("chocolate cake");
-
     }
 
     private void copyFile(InputStream inputStream, OutputStream outputStream) throws IOException {
         byte buffer[] = new byte[2048];
 
-        while(true) {
+        while (true) {
             int r = inputStream.read(buffer);
             if (r < 0) {
                 break;
