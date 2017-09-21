@@ -1,27 +1,39 @@
 language: android
 jdk: oraclejdk8
 
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/gradle/caches/
+    - ${TRAVIS_BUILD_DIR}/gradle/wrapper/dists/
+
 env:
   matrix:
-    - ANDROID_TARGET=android-15  ANDROID_ABI=armeabi-v7a
+    - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
 
 android:
   components:
     - tools
     - platform-tools
     - build-tools-24.0.2
+    - android-19
     - android-24
     - extra-android-m2repository
+
+    # Specify at least one system image,
+    # if you need to run emulator(s) during your tests
+    - sys-img-armeabi-v7a-android-19
 
 licenses:
     - 'android-sdk-license-.+'
 
 before_script:
+  # Needed for publish script
+  - touch local.properties
+  # Quick check code is compiled before running emulator
+  - ./gradlew clean assembleDebug
   # Create and start emulator
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-skin -no-audio -no-window &
   - android-wait-for-emulator
-  - adb shell input keyevent 82 &
-  - echo > local.properties
 
-script: ./gradlew connectedAndroidTest
+script: ./gradlew clean connectedAndroidTest
