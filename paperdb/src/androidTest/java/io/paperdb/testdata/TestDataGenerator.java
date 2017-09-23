@@ -32,9 +32,9 @@ public class TestDataGenerator {
         p.setBikes(new String[2]);
         p.getBikes()[0] = "Kellys gen#" + i;
         p.getBikes()[1] = "Trek gen#" + i;
-        p.setPhoneNumbers(new ArrayList<String>());
-        p.getPhoneNumbers().add("0-KEEP-CALM" + i);
-        p.getPhoneNumbers().add("0-USE-PAPER" + i);
+        p.setPhoneNumbers(new ArrayList<PhoneNumber>());
+        p.getPhoneNumbers().add(new PhoneNumber("0-KEEP-CALM" + i));
+        p.getPhoneNumbers().add(new PhoneNumber("0-USE-PAPER" + i));
         return p;
     }
 

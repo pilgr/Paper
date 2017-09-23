@@ -39,7 +39,7 @@ public class DbStoragePlainFile implements Storage {
     private final HashMap<Class, Serializer> mCustomSerializers;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
-    private KeyLocker keyLocker = new KeyLocker();
+    private KeyLocker keyLocker = new KeyLocker(); // To sync key-dependent operations by key
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -132,14 +132,8 @@ public class DbStoragePlainFile implements Storage {
             }
 
             writeTableFile(key, paperTable, originalFile, backupFile);
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
-            try {
-                keyLocker.release(key);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            keyLocker.release(key);
         }
     }
 
@@ -158,25 +152,27 @@ public class DbStoragePlainFile implements Storage {
                 backupFile.renameTo(originalFile);
             }
 
-            if (!exist(key)) {
+            if (!existInternal(key)) {
                 return null;
             }
 
             return readTableFile(key, originalFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         } finally {
-            try {
-                keyLocker.release(key);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            keyLocker.release(key);
         }
     }
 
     @Override
     public boolean exist(String key) {
+        try {
+            keyLocker.acquire(key);
+            return existInternal(key);
+        } finally {
+            keyLocker.release(key);
+        }
+    }
+
+    private boolean existInternal(String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -184,15 +180,20 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
-    public synchronized long lastModified(String key) {
-        assertInit();
+    public long lastModified(String key) {
+        try {
+            keyLocker.acquire(key);
+            assertInit();
 
-        final File originalFile = getOriginalFile(key);
-        return originalFile.exists() ? originalFile.lastModified() : -1;
+            final File originalFile = getOriginalFile(key);
+            return originalFile.exists() ? originalFile.lastModified() : -1;
+        } finally {
+            keyLocker.release(key);
+        }
     }
 
     @Override
-    public List<String> getAllKeys() {
+    public synchronized List<String> getAllKeys() {
         assertInit();
 
         File bookFolder = new File(mFilesDir);
@@ -224,14 +225,8 @@ public class DbStoragePlainFile implements Storage {
                 throw new PaperDbException("Couldn't delete file " + originalFile
                         + " for table " + key);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
-            try {
-                keyLocker.release(key);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            keyLocker.release(key);
         }
     }
 

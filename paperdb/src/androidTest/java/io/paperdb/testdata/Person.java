@@ -6,7 +6,7 @@ import java.util.List;
 public class Person {
     private String mName;
     private int mAge;
-    private List<String> mPhoneNumbers;
+    private List<PhoneNumber> mPhoneNumbers;
     private String[] mBikes;
 
     public String getName() {
@@ -25,11 +25,11 @@ public class Person {
         mAge = age;
     }
 
-    public List<String> getPhoneNumbers() {
+    public List<PhoneNumber> getPhoneNumbers() {
         return mPhoneNumbers;
     }
 
-    public void setPhoneNumbers(List<String> phoneNumbers) {
+    public void setPhoneNumbers(List<PhoneNumber> phoneNumbers) {
         mPhoneNumbers = phoneNumbers;
     }
 
