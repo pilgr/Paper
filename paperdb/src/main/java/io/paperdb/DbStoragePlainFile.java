@@ -39,6 +39,7 @@ public class DbStoragePlainFile implements Storage {
     private final HashMap<Class, Serializer> mCustomSerializers;
     private String mFilesDir;
     private boolean mPaperDirIsCreated;
+    private KeyLocker keyLocker = new KeyLocker(); // To sync key-dependent operations by key
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -106,53 +107,72 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
-    public synchronized <E> void insert(String key, E value) {
-        assertInit();
+    public <E> void insert(String key, E value) {
+        try {
+            keyLocker.acquire(key);
+            assertInit();
 
-        final PaperTable<E> paperTable = new PaperTable<>(value);
+            final PaperTable<E> paperTable = new PaperTable<>(value);
 
-        final File originalFile = getOriginalFile(key);
-        final File backupFile = makeBackupFile(originalFile);
-        // Rename the current file so it may be used as a backup during the next read
-        if (originalFile.exists()) {
-            //Rename original to backup
-            if (!backupFile.exists()) {
-                if (!originalFile.renameTo(backupFile)) {
-                    throw new PaperDbException("Couldn't rename file " + originalFile
-                            + " to backup file " + backupFile);
+            final File originalFile = getOriginalFile(key);
+            final File backupFile = makeBackupFile(originalFile);
+            // Rename the current file so it may be used as a backup during the next read
+            if (originalFile.exists()) {
+                //Rename original to backup
+                if (!backupFile.exists()) {
+                    if (!originalFile.renameTo(backupFile)) {
+                        throw new PaperDbException("Couldn't rename file " + originalFile
+                                + " to backup file " + backupFile);
+                    }
+                } else {
+                    //Backup exist -> original file is broken and must be deleted
+                    //noinspection ResultOfMethodCallIgnored
+                    originalFile.delete();
                 }
-            } else {
-                //Backup exist -> original file is broken and must be deleted
+            }
+
+            writeTableFile(key, paperTable, originalFile, backupFile);
+        } finally {
+            keyLocker.release(key);
+        }
+    }
+
+    @Override
+    public <E> E select(String key) {
+        try {
+            keyLocker.acquire(key);
+            assertInit();
+
+            final File originalFile = getOriginalFile(key);
+            final File backupFile = makeBackupFile(originalFile);
+            if (backupFile.exists()) {
                 //noinspection ResultOfMethodCallIgnored
                 originalFile.delete();
+                //noinspection ResultOfMethodCallIgnored
+                backupFile.renameTo(originalFile);
             }
-        }
 
-        writeTableFile(key, paperTable, originalFile, backupFile);
+            if (!existInternal(key)) {
+                return null;
+            }
+
+            return readTableFile(key, originalFile);
+        } finally {
+            keyLocker.release(key);
+        }
     }
 
     @Override
-    public synchronized <E> E select(String key) {
-        assertInit();
-
-        final File originalFile = getOriginalFile(key);
-        final File backupFile = makeBackupFile(originalFile);
-        if (backupFile.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            originalFile.delete();
-            //noinspection ResultOfMethodCallIgnored
-            backupFile.renameTo(originalFile);
+    public boolean exist(String key) {
+        try {
+            keyLocker.acquire(key);
+            return existInternal(key);
+        } finally {
+            keyLocker.release(key);
         }
-
-        if (!exist(key)) {
-            return null;
-        }
-
-        return readTableFile(key, originalFile);
     }
 
-    @Override
-    public synchronized boolean exist(String key) {
+    private boolean existInternal(String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -160,15 +180,20 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
-    public synchronized long lastModified(String key) {
-        assertInit();
+    public long lastModified(String key) {
+        try {
+            keyLocker.acquire(key);
+            assertInit();
 
-        final File originalFile = getOriginalFile(key);
-        return originalFile.exists() ? originalFile.lastModified() : -1;
+            final File originalFile = getOriginalFile(key);
+            return originalFile.exists() ? originalFile.lastModified() : -1;
+        } finally {
+            keyLocker.release(key);
+        }
     }
 
     @Override
-    public List<String> getAllKeys() {
+    public synchronized List<String> getAllKeys() {
         assertInit();
 
         File bookFolder = new File(mFilesDir);
@@ -185,18 +210,23 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
-    public synchronized void deleteIfExists(String key) {
-        assertInit();
+    public void deleteIfExists(String key) {
+        try {
+            keyLocker.acquire(key);
+            assertInit();
 
-        final File originalFile = getOriginalFile(key);
-        if (!originalFile.exists()) {
-            return;
-        }
+            final File originalFile = getOriginalFile(key);
+            if (!originalFile.exists()) {
+                return;
+            }
 
-        boolean deleted = originalFile.delete();
-        if (!deleted) {
-            throw new PaperDbException("Couldn't delete file " + originalFile
-                    + " for table " + key);
+            boolean deleted = originalFile.delete();
+            if (!deleted) {
+                throw new PaperDbException("Couldn't delete file " + originalFile
+                        + " for table " + key);
+            }
+        } finally {
+            keyLocker.release(key);
         }
     }
 
