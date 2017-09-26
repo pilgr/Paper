@@ -1,26 +1,26 @@
 # Paper
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Paper-blue.svg?style=flat)](http://android-arsenal.com/details/1/2080)   [![Build Status](https://travis-ci.org/pilgr/Paper.svg?branch=master)](https://travis-ci.org/pilgr/Paper)
 
-Paper is a [fast](#benchmark-results) NoSQL data storage for Android that lets you save/restore Java/Kotlin objects using efficient Kryo serialization. Class structure changes handled automatically.
+Paper is a [fast](#benchmark-results) NoSQL-like storage for Java/Kotlin objects on Android with automatic schema migration support.
 
 ![Paper icon](/paper_icon.png)
 
-# The update contains critical fixes, please update Paper to version 2.5 ASAP!
-
 ### What's [new](/CHANGELOG.md) in 2.5
-* (!) Fixed crash on data migration when switching lib from 1.x to 2.x
-* (!) Fixed possible data loss on failed read attempt. 
+(!) This update contains critical fixes, please update your project ASAP!
+* Fixed crash on reading data saved with Paper 1.x.
+* Fixed potential data loss on failed read attempt. 
 
 ### What's [new](/CHANGELOG.md) in 2.1
-* (!) Fixed exception causing data corruption on Android N+ (happens if targetSdkVersion=25+);
-* Get timestamp of last update using `book.lastModified(key)`;
-* Set log level for internal Kryo serializer using `Paper.setLogLevel()` or `book.setLogLevel()` ;
+* Fixed exception potentially causing data corruption on Android N+ (for targetSdkVersion=25+);
+* New API: 
+    * `book.lastModified(key)` to get last data modification timestamp;
+    * `Paper.setLogLevel()` or `book.setLogLevel()` to set log level for internal Kryo serializer;
 
 Thanks @aaronpoweruser and @fiskurgit for contrib!
 
 ### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:2.1'
+compile 'io.paperdb:paperdb:2.5'
 ```
 
 ### Initialize Paper
@@ -30,20 +30,20 @@ Should be initialized one time in onCreate() in Application or Activity.
 Paper.init(context);
 ```
 
-It's OK to call it in UI thread. All other methods should be used in background thread.
+It's OK to call it in UI thread. All other methods should be used in background.
 
 ### Save
-Save data object.
+Save any data objects, Map, List, HashMap etc. including all the internal data hierarchy. 
 Paper creates separate data file for each key.
 
 ```java
-Paper.book().write("city", "Lund"); // Primitive
+Paper.book().write("city", "Lund"); // Object
 Paper.book().write("task-queue", queue); // LinkedList
-Paper.book().write("countries", countryCodeMap); // HashMap
+Paper.book().write("countries", countryCodeMap); // HashMap etc.
 ```
 
 ### Read
-Read data objects. Paper instantiates exactly the classes which has been used in saved data. The limited backward and forward compatibility is supported. See [Handle data class changes](#handle-data-structure-changes).
+Read data objects, the instantiated class is exactly the one used to save data. Limited changes to the class structure are handled automatically. See [Handle data class changes](#handle-data-structure-changes).
 
 ```java
 String city = Paper.book().read("city");
@@ -92,19 +92,19 @@ Class fields which has been removed will be ignored on restore and new fields wi
 
 ```java
 class Volcano {
-        public String name; // I like Eyjafjallajökull
-        public boolean isActive;
-    }
+    public String name;
+    public boolean isActive;
+}
 ```
 
 And then you realized you need to change the class like:
 
 ```java
 class Volcano {
-        public String name; // I like Eyjafjallajökull
-        // public boolean isActive; removed field, who cares about volcano activity
-        public Location location; // New field
-    }
+    public String name;
+    // public boolean isActive; removed field
+    public Location location; // New field
+}
 ```
 
 Then on restore the _isActive_ field will be ignored and new _location_ field will have its default value _null_.
@@ -116,13 +116,13 @@ Use _transient_ keyword for fields which you want to exclude from saving process
 public transient String tempId = "default"; // Won't be saved
 ```
 ### Proguard config
-* Keep data classes:
+* Keep your data classes from modification by Proguard:
 
 ```
--keep class my.package.data.model.** { *; }
+-keep class your.app.data.model.** { *; }
 ```
 
-alternatively you can implement _Serializable_ for all your data classes and keep all of them using:
+also you can implement _Serializable_ for all your data classes and keep all of them using:
 
 ```
 -keep class * implements java.io.Serializable { *; }
@@ -130,10 +130,10 @@ alternatively you can implement _Serializable_ for all your data classes and kee
 
 ### How it works
 Paper is based on the following assumptions:
-- Saved data on mobile are relatively small;
-- Random file access on flash storage is very fast.
+- Datasets on mobile devices are small and usually don't have relations in between; 
+- Random file access on flash storage is very fast;
 
-So each data object is saved in separate file and write/read operations write/read whole file.
+Paper saves each object for given key in a separate file and every write/read operations write/read the whole file.
 
 The [Kryo](https://github.com/EsotericSoftware/kryo) is used for object graph serialization and to provide data compatibility support.
 
@@ -147,10 +147,10 @@ Running [Benchmark](https://github.com/pilgr/Paper/blob/master/paperdb/src/andro
 | Read 500 contacts         | 79       | 155      |          |
 
 ### Limitations
-* Circular references is not supported
+* Circular references are not supported
 
 ### Apps using Paper
-- [AppDialer](https://play.google.com/store/apps/details?id=name.pilgr.appdialer) – Paper _initially_ has been developed to reduce start up time for AppDialer. Currently AppDialer has the best start up time in its class. And simple no-sql-pain data storage layer like a bonus.
+- [AppDialer](https://play.google.com/store/apps/details?id=name.pilgr.appdialer) – Paper initially has been developed as internal lib to reduce start up time for AppDialer. Currently AppDialer has the best start up time in its class. And simple no-sql-pain data storage layer like a bonus.
 
 ### License
     Copyright 2015 Aleksey Masny
