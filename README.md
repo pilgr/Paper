@@ -6,17 +6,13 @@ Paper is a [fast](#benchmark-results) NoSQL-like storage for Java/Kotlin objects
 ![Paper icon](/paper_icon.png)
 
 ### What's [new](/CHANGELOG.md) in 2.5
+* 
+Thanks [@hiperioncn](https://github.com/hiperioncn) for your contribution!
+
+### What's [new](/CHANGELOG.md) in 2.5
 (!) This update contains critical fixes, please update your project ASAP!
 * Fixed crash on reading data saved with Paper 1.x.
 * Fixed potential data loss on failed read attempt. 
-
-### What's [new](/CHANGELOG.md) in 2.1
-* Fixed exception potentially causing data corruption on Android N+ (for targetSdkVersion=25+);
-* New API: 
-    * `book.lastModified(key)` to get last data modification timestamp;
-    * `Paper.setLogLevel()` or `book.setLogLevel()` to set log level for internal Kryo serializer;
-
-Thanks @aaronpoweruser and @fiskurgit for contrib!
 
 ### Add dependency
 ```groovy
@@ -30,8 +26,10 @@ Should be initialized one time in onCreate() in Application or Activity.
 Paper.init(context);
 ```
 
-It's OK to call it in UI thread. All other methods should be used in background.
-
+### Threading
+* `Paper.init()` should be called in UI thread; 
+* All other APIs (`write`, `read` etc.) are thread-safe and obviously must be called outside of UI thread. Since of v2.6 simultaneous reading/writing for different `key`s significantly improves the performance (up to 97% per thread). 
+ 
 ### Save
 Save any data objects, Map, List, HashMap etc. including all the internal data hierarchy. 
 Paper creates separate data file for each key.
