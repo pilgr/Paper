@@ -10,7 +10,7 @@ interface Storage {
 
     <E> E select(String key);
 
-    boolean exist(String key);
+    boolean exists(String key);
 
     long lastModified(String key);
 

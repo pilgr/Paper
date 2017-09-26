@@ -21,7 +21,7 @@ import static org.junit.Assert.assertFalse;
  * Tests deprecated API
  */
 @RunWith(AndroidJUnit4.class)
-public class PaperTest {
+public class PaperDeprecatedAPITest {
 
     @Before
     public void setUp() throws Exception {
@@ -34,6 +34,13 @@ public class PaperTest {
         assertFalse(Paper.exist("persons"));
         Paper.put("persons", TestDataGenerator.genPersonList(10));
         assertTrue(Paper.exist("persons"));
+    }
+
+    @Test
+    public void testPaperExist() throws Exception {
+        assertFalse(Paper.book().exist("persons"));
+        Paper.book().write("persons", TestDataGenerator.genPersonList(10));
+        assertTrue(Paper.book().exist("persons"));
     }
 
     @Test

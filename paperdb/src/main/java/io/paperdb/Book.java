@@ -70,24 +70,35 @@ public class Book {
     }
 
     /**
-     * Check if an object with the given key is saved in Book storage.
+     * Checks if an object with the given key is saved in Book storage.
      *
      * @param key object key
      * @return true if object with given key exists in Book storage, false otherwise
      */
+    public boolean exists(String key) {
+        return mStorage.exists(key);
+    }
+
+    /**
+     * Checks if an object with the given key is saved in Book storage.
+     *
+     * @param key object key
+     * @return true if object with given key exists in Book storage, false otherwise
+     * @deprecated As of release 2.6, replaced by {@link #exists(String)}}
+     */
     public boolean exist(String key) {
-        return mStorage.exist(key);
+        return mStorage.exists(key);
     }
 
     /**
      * Returns lastModified timestamp of last write in ms.
-     * NOTE: only seconds granularity is guaranteed as many file system don't support
-     * milliseconds granularity for file's last-modification time
+     * NOTE: only granularity in seconds is guaranteed. Some file systems keep
+     * file modification time only in seconds.
      *
      * @param key object key
      * @return timestamp of last write for given key in ms if it exists, otherwise -1
      */
-    public long lastModified(String key){
+    public long lastModified(String key) {
         return mStorage.lastModified(key);
     }
 

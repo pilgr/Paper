@@ -152,7 +152,7 @@ public class DbStoragePlainFile implements Storage {
                 backupFile.renameTo(originalFile);
             }
 
-            if (!existInternal(key)) {
+            if (!existsInternal(key)) {
                 return null;
             }
 
@@ -163,16 +163,16 @@ public class DbStoragePlainFile implements Storage {
     }
 
     @Override
-    public boolean exist(String key) {
+    public boolean exists(String key) {
         try {
             keyLocker.acquire(key);
-            return existInternal(key);
+            return existsInternal(key);
         } finally {
             keyLocker.release(key);
         }
     }
 
-    private boolean existInternal(String key) {
+    private boolean existsInternal(String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);

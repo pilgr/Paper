@@ -35,22 +35,22 @@ public class PaperTest {
 
     @Test
     public void testExist() throws Exception {
-        assertFalse(Paper.book().exist("persons"));
+        assertFalse(Paper.book().exists("persons"));
         Paper.book().write("persons", TestDataGenerator.genPersonList(10));
-        assertTrue(Paper.book().exist("persons"));
+        assertTrue(Paper.book().exists("persons"));
     }
 
     @Test
     public void testDelete() throws Exception {
         Paper.book().write("persons", TestDataGenerator.genPersonList(10));
-        assertTrue(Paper.book().exist("persons"));
+        assertTrue(Paper.book().exists("persons"));
         Paper.book().delete("persons");
-        assertFalse(Paper.book().exist("persons"));
+        assertFalse(Paper.book().exists("persons"));
     }
 
     @Test
     public void testDeleteNotExisted() throws Exception {
-        assertFalse(Paper.book().exist("persons"));
+        assertFalse(Paper.book().exists("persons"));
         Paper.book().delete("persons");
     }
 
@@ -58,17 +58,17 @@ public class PaperTest {
     public void testClear() throws Exception {
         Paper.book().write("persons", TestDataGenerator.genPersonList(10));
         Paper.book().write("persons2", TestDataGenerator.genPersonList(20));
-        assertTrue(Paper.book().exist("persons"));
-        assertTrue(Paper.book().exist("persons2"));
+        assertTrue(Paper.book().exists("persons"));
+        assertTrue(Paper.book().exists("persons2"));
 
         Paper.book().destroy();
         // init() call is not required after clear()
-        assertFalse(Paper.book().exist("persons"));
-        assertFalse(Paper.book().exist("persons2"));
+        assertFalse(Paper.book().exists("persons"));
+        assertFalse(Paper.book().exists("persons2"));
 
         // Should be possible to continue to use Paper after clear()
         Paper.book().write("persons3", TestDataGenerator.genPersonList(30));
-        assertTrue(Paper.book().exist("persons3"));
+        assertTrue(Paper.book().exists("persons3"));
         assertThat(Paper.book().<List>read("persons3")).hasSize(30);
     }
 
@@ -226,10 +226,10 @@ public class PaperTest {
     @Test
     public void testDbFileExistsAfterFailedRead() throws IOException {
         String key = "cityMap";
-        assertFalse(Paper.book().exist(key));
+        assertFalse(Paper.book().exists(key));
 
         TestUtils.replacePaperDbFileBy("invalid_data.pt", key);
-        assertTrue(Paper.book().exist(key));
+        assertTrue(Paper.book().exists(key));
 
         Throwable expectedException = null;
         try {
@@ -239,7 +239,7 @@ public class PaperTest {
         }
         assertNotNull(expectedException);
         // Data file should exist even if previous read attempt was failed
-        assertTrue(Paper.book().exist(key));
+        assertTrue(Paper.book().exists(key));
     }
 
 }
