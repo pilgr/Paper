@@ -32,13 +32,11 @@ import io.paperdb.serializer.NoArgCollectionSerializer;
 
 import static io.paperdb.Paper.TAG;
 
-public class DbStoragePlainFile implements Storage {
+public class DbStoragePlainFile {
 
-    private final Context mContext;
-    private final String mDbName;
+    private final String mDbPath;
     private final HashMap<Class, Serializer> mCustomSerializers;
-    private String mFilesDir;
-    private boolean mPaperDirIsCreated;
+    private volatile boolean mPaperDirIsCreated;
     private KeyLocker keyLocker = new KeyLocker(); // To sync key-dependent operations by key
 
     private Kryo getKryo() {
@@ -90,24 +88,20 @@ public class DbStoragePlainFile implements Storage {
 
     DbStoragePlainFile(Context context, String dbName,
                        HashMap<Class, Serializer> serializers) {
-        mContext = context;
-        mDbName = dbName;
         mCustomSerializers = serializers;
+        mDbPath = context.getFilesDir() + File.separator + dbName;
     }
 
-    @Override
     public synchronized void destroy() {
         assertInit();
 
-        final String dbPath = getDbPath(mContext, mDbName);
-        if (!deleteDirectory(dbPath)) {
-            Log.e(TAG, "Couldn't delete Paper dir " + dbPath);
+        if (!deleteDirectory(mDbPath)) {
+            Log.e(TAG, "Couldn't delete Paper dir " + mDbPath);
         }
         mPaperDirIsCreated = false;
     }
 
-    @Override
-    public <E> void insert(String key, E value) {
+    <E> void insert(String key, E value) {
         try {
             keyLocker.acquire(key);
             assertInit();
@@ -137,8 +131,7 @@ public class DbStoragePlainFile implements Storage {
         }
     }
 
-    @Override
-    public <E> E select(String key) {
+    <E> E select(String key) {
         try {
             keyLocker.acquire(key);
             assertInit();
@@ -162,8 +155,7 @@ public class DbStoragePlainFile implements Storage {
         }
     }
 
-    @Override
-    public boolean exists(String key) {
+    boolean exists(String key) {
         try {
             keyLocker.acquire(key);
             return existsInternal(key);
@@ -179,8 +171,7 @@ public class DbStoragePlainFile implements Storage {
         return originalFile.exists();
     }
 
-    @Override
-    public long lastModified(String key) {
+    long lastModified(String key) {
         try {
             keyLocker.acquire(key);
             assertInit();
@@ -192,11 +183,10 @@ public class DbStoragePlainFile implements Storage {
         }
     }
 
-    @Override
-    public synchronized List<String> getAllKeys() {
+    synchronized List<String> getAllKeys() {
         assertInit();
 
-        File bookFolder = new File(mFilesDir);
+        File bookFolder = new File(mDbPath);
         String[] names = bookFolder.list();
         if (names != null) {
             //remove extensions
@@ -209,8 +199,7 @@ public class DbStoragePlainFile implements Storage {
         }
     }
 
-    @Override
-    public void deleteIfExists(String key) {
+    void deleteIfExists(String key) {
         try {
             keyLocker.acquire(key);
             assertInit();
@@ -230,13 +219,20 @@ public class DbStoragePlainFile implements Storage {
         }
     }
 
-    @Override
-    public void setLogLevel(int level) {
+    void setLogLevel(int level) {
         com.esotericsoftware.minlog.Log.set(level);
     }
 
+    String getOriginalFilePath(String key) {
+        return mDbPath + File.separator + key + ".pt";
+    }
+
+    String getRootFolderPath() {
+        return mDbPath;
+    }
+
     private File getOriginalFile(String key) {
-        final String tablePath = mFilesDir + File.separator + key + ".pt";
+        final String tablePath = getOriginalFilePath(key);
         return new File(tablePath);
     }
 
@@ -309,10 +305,6 @@ public class DbStoragePlainFile implements Storage {
         }
     }
 
-    private String getDbPath(Context context, String dbName) {
-        return context.getFilesDir() + File.separator + dbName;
-    }
-
     private void assertInit() {
         if (!mPaperDirIsCreated) {
             createPaperDir();
@@ -321,11 +313,10 @@ public class DbStoragePlainFile implements Storage {
     }
 
     private void createPaperDir() {
-        mFilesDir = getDbPath(mContext, mDbName);
-        if (!new File(mFilesDir).exists()) {
-            boolean isReady = new File(mFilesDir).mkdirs();
+        if (!new File(mDbPath).exists()) {
+            boolean isReady = new File(mDbPath).mkdirs();
             if (!isReady) {
-                throw new RuntimeException("Couldn't create Paper dir: " + mFilesDir);
+                throw new RuntimeException("Couldn't create Paper dir: " + mDbPath);
             }
         }
     }

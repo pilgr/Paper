@@ -242,4 +242,28 @@ public class PaperTest {
         assertTrue(Paper.book().exists(key));
     }
 
+    @Test
+    public void getFolderPathForBook_default() {
+        assertEquals("/data/user/0/io.paperdb.test/files/io.paperdb",
+                Paper.book().getPath());
+    }
+
+    @Test
+    public void getFolderPathForBook_custom() {
+        assertEquals("/data/user/0/io.paperdb.test/files/custom",
+                Paper.book("custom").getPath());
+    }
+
+    @Test
+    public void getFilePathForKey_defaultBook() {
+        assertEquals("/data/user/0/io.paperdb.test/files/io.paperdb/my_key.pt",
+                Paper.book().getFilePath("my_key"));
+    }
+
+    @Test
+    public void getFilePathForKey_customBook() {
+        assertEquals("/data/user/0/io.paperdb.test/files/custom/my_key.pt",
+                Paper.book("custom").getFilePath("my_key"));
+    }
+
 }
