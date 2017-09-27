@@ -180,10 +180,10 @@ public class PaperTest {
     @Test
     public void testCustomSerializer() {
         Paper.addSerializer(DateTime.class, new JodaDateTimeSerializer());
-
         DateTime now = DateTime.now(DateTimeZone.UTC);
-        Paper.book("custom").write("joda-datetime", now);
-        assertEquals(Paper.book("custom").read("joda-datetime"), now);
+
+        Paper.book().write("joda-datetime", now);
+        assertEquals(now, Paper.book().read("joda-datetime"));
     }
 
     @Test
@@ -244,26 +244,26 @@ public class PaperTest {
 
     @Test
     public void getFolderPathForBook_default() {
-        assertEquals("/data/user/0/io.paperdb.test/files/io.paperdb",
-                Paper.book().getPath());
+        String path = Paper.book().getPath();
+        assertTrue(path.endsWith("/io.paperdb.test/files/io.paperdb"));
     }
 
     @Test
     public void getFolderPathForBook_custom() {
-        assertEquals("/data/user/0/io.paperdb.test/files/custom",
-                Paper.book("custom").getPath());
+        String path = Paper.book("custom").getPath();
+        assertTrue(path.endsWith("/io.paperdb.test/files/custom"));
     }
 
     @Test
     public void getFilePathForKey_defaultBook() {
-        assertEquals("/data/user/0/io.paperdb.test/files/io.paperdb/my_key.pt",
-                Paper.book().getPath("my_key"));
+        String path = Paper.book().getPath("my_key");
+        assertTrue(path.endsWith("/io.paperdb.test/files/io.paperdb/my_key.pt"));
     }
 
     @Test
     public void getFilePathForKey_customBook() {
-        assertEquals("/data/user/0/io.paperdb.test/files/custom/my_key.pt",
-                Paper.book("custom").getPath("my_key"));
+        String path = Paper.book("custom").getPath("my_key");
+        assertTrue(path.endsWith("/io.paperdb.test/files/custom/my_key.pt"));
     }
 
 }
