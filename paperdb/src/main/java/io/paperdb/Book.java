@@ -132,10 +132,11 @@ public class Book {
 
     /**
      * Returns path to a folder containing *.pt files for all keys kept
-     * in the current Book. Handy for Book export/import purposes.
-     * The returned path may not exist if the method has been called prior
+     * in the current Book. Could be handy for Book export/import purposes.
+     * The returned path does not exist if the method has been called prior
      * saving any data in the current Book.
-     * To get path for a particular key use {@link #getFilePath(String)} instead.
+     * <p>
+     * See also {@link #getPath(String)}.
      *
      * @return path to a folder locating data files for the current Book
      */
@@ -143,7 +144,18 @@ public class Book {
         return mStorage.getRootFolderPath();
     }
 
-    public String getFilePath(String key) {
+    /**
+     * Returns path to a *.pt file containing saved object for a given key.
+     * Could be handy for object export/import purposes.
+     * The returned path does not exist if the method has been called prior
+     * saving data for the given key.
+     * <p>
+     * See also {@link #getPath()}.
+     *
+     * @param key object key
+     * @return path to a *.pt file containing saved object for a given key.
+     */
+    public String getPath(String key) {
         return mStorage.getOriginalFilePath(key);
     }
 }

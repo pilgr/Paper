@@ -257,13 +257,13 @@ public class PaperTest {
     @Test
     public void getFilePathForKey_defaultBook() {
         assertEquals("/data/user/0/io.paperdb.test/files/io.paperdb/my_key.pt",
-                Paper.book().getFilePath("my_key"));
+                Paper.book().getPath("my_key"));
     }
 
     @Test
     public void getFilePathForKey_customBook() {
         assertEquals("/data/user/0/io.paperdb.test/files/custom/my_key.pt",
-                Paper.book("custom").getFilePath("my_key"));
+                Paper.book("custom").getPath("my_key"));
     }
 
 }

@@ -113,6 +113,12 @@ Use _transient_ keyword for fields which you want to exclude from saving process
 ```java
 public transient String tempId = "default"; // Won't be saved
 ```
+
+### Export/Import
+* Use `Paper.book().getPath()` to get path for a folder containing all *.pt files for a given book.
+* Use `Paper.book().getPath(key)` to get path for a particular *.pt file containing saved object for a given key.
+ Feel free to copy/rewrite those files for export/import purposes. It's your responsibility to finalize file's export/import operations prior accessing data over Paper API.
+
 ### Proguard config
 * Keep your data classes from modification by Proguard:
 
