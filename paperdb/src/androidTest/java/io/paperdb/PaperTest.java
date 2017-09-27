@@ -249,21 +249,9 @@ public class PaperTest {
     }
 
     @Test
-    public void getFolderPathForBook_custom() {
-        String path = Paper.book("custom").getPath();
-        assertTrue(path.endsWith("/io.paperdb.test/files/custom"));
-    }
-
-    @Test
     public void getFilePathForKey_defaultBook() {
         String path = Paper.book().getPath("my_key");
         assertTrue(path.endsWith("/io.paperdb.test/files/io.paperdb/my_key.pt"));
-    }
-
-    @Test
-    public void getFilePathForKey_customBook() {
-        String path = Paper.book("custom").getPath("my_key");
-        assertTrue(path.endsWith("/io.paperdb.test/files/custom/my_key.pt"));
     }
 
 }
