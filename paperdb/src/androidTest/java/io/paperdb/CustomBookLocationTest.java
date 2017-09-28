@@ -23,7 +23,7 @@ public class CustomBookLocationTest {
 
     @Test
     public void readWriteDelete_customLocation_defaultBook() {
-        String customLocation = getTargetContext().getDataDir() + "/custom_location";
+        String customLocation = getTargetContext().getFilesDir() + "/custom/location";
         Book bookOnSdcard = Paper.bookOn(customLocation);
         Book defaultBook = Paper.book();
 
@@ -44,7 +44,7 @@ public class CustomBookLocationTest {
 
     @Test
     public void readWriteDelete_customLocation_customBook() {
-        String customLocation = getTargetContext().getDataDir() + "/custom_location";
+        String customLocation = getTargetContext().getFilesDir() + "/custom/location";
         Book bookOnSdcard = Paper.bookOn(customLocation, "encyclopedia");
         Book defaultBook = Paper.book("encyclopedia");
 
