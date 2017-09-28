@@ -2,6 +2,8 @@ package io.paperdb;
 
 import android.support.test.runner.AndroidJUnit4;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,6 +63,18 @@ public class CustomBookLocationTest {
 
         assertFalse(bookOnSdcard.exists("city"));
         assertEquals("Kyiv", defaultBook.read("city"));
+    }
+
+    @Test
+    public void useCacheFolderAsCustomLocation() {
+        String cachePath = getTargetContext().getCacheDir().toString();
+        Book cache = Paper.bookOn(cachePath);
+        cache.destroy();
+
+        cache.write("city", "Kyiv");
+        assertEquals("Kyiv", cache.read("city"));
+
+        Assert.assertTrue(cache.getPath().endsWith("/io.paperdb.test/cache/io.paperdb"));
     }
 
     @Test
