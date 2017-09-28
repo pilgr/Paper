@@ -16,6 +16,10 @@ public class Book {
         mStorage = new DbStoragePlainFile(context.getApplicationContext(), dbName, serializers);
     }
 
+    protected Book(String dbPath, String dbName, HashMap<Class, Serializer> serializers) {
+        mStorage = new DbStoragePlainFile(dbPath, dbName, serializers);
+    }
+
     /**
      * Destroys all data saved in Book.
      */

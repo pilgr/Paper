@@ -1,11 +1,13 @@
 package io.paperdb;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
 import com.esotericsoftware.kryo.Serializer;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,12 +24,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * Each object is saved in separate Paper file with name like object_key.pt.
  * All Paper files are created in the /files/io.paperdb dir in app's private storage.
  */
+@SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
 public class Paper {
     static final String TAG = "paperdb";
 
     static final String DEFAULT_DB_NAME = "io.paperdb";
 
-    private static Context mContext;
+    // Keep _application_ context
+    @SuppressLint("StaticFieldLeak") private static Context mContext;
 
     private static final ConcurrentHashMap<String, Book> mBookMap = new ConcurrentHashMap<>();
     private static final HashMap<Class, Serializer> mCustomSerializers = new HashMap<>();
@@ -44,7 +48,7 @@ public class Paper {
     }
 
     /**
-     * Returns paper book instance with the given name
+     * Returns book instance with the given name
      *
      * @param name name of new database
      * @return Paper instance
@@ -52,30 +56,64 @@ public class Paper {
     public static Book book(String name) {
         if (name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
                 " name is reserved for default library name");
-        return getBook(name);
+        return getBook(null, name);
     }
 
     /**
-     * Returns default paper book instance
+     * Returns default book instance
      *
      * @return Book instance
      */
     public static Book book() {
-        return getBook(DEFAULT_DB_NAME);
+        return getBook(null, DEFAULT_DB_NAME);
     }
 
-    private static Book getBook(String name) {
+    /**
+     * Returns book instance to save data at custom location, e.g. on sdcard.
+     *
+     * @param location the path to a folder where the book's folder will be placed
+     * @param name     the name of the book
+     * @return book instance
+     */
+    public static Book bookOn(String location, String name) {
+        location = removeLastFileSeparatorIfExists(location);
+        return getBook(location, name);
+    }
+
+    /**
+     * Returns book instance to save data at custom location, e.g. on sdcard.
+     *
+     * @param location the path to a folder where the book's folder will be placed
+     * @return book instance
+     */
+    public static Book bookOn(String location) {
+        return bookOn(location, DEFAULT_DB_NAME);
+    }
+
+    private static Book getBook(String location, String name) {
         if (mContext == null) {
             throw new PaperDbException("Paper.init is not called");
         }
+        String key = (location == null ? "" : location) + name;
         synchronized (mBookMap) {
-            Book book = mBookMap.get(name);
+            Book book = mBookMap.get(key);
             if (book == null) {
-                book = new Book(mContext, name, mCustomSerializers);
-                mBookMap.put(name, book);
+                if (location == null) {
+                    book = new Book(mContext, name, mCustomSerializers);
+                } else {
+                    book = new Book(location, name, mCustomSerializers);
+                }
+                mBookMap.put(key, book);
             }
             return book;
         }
+    }
+
+    private static String removeLastFileSeparatorIfExists(String customLocation) {
+        if (customLocation.endsWith(File.separator)) {
+            customLocation = customLocation.substring(0, customLocation.length() - 1);
+        }
+        return customLocation;
     }
 
     /**
@@ -103,7 +141,7 @@ public class Paper {
      * @deprecated use Paper.book().exist()
      */
     public static boolean exist(String key) {
-        return book().exist(key);
+        return book().exists(key);
     }
 
     /**
@@ -123,7 +161,7 @@ public class Paper {
     }
 
     /**
-     *  Sets log level for internal Kryo serializer
+     * Sets log level for internal Kryo serializer
      *
      * @param level one of levels from {@link com.esotericsoftware.minlog.Log }
      */

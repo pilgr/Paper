@@ -92,6 +92,12 @@ public class DbStoragePlainFile {
         mDbPath = context.getFilesDir() + File.separator + dbName;
     }
 
+    DbStoragePlainFile(String dbFilesDir, String dbName,
+                       HashMap<Class, Serializer> serializers) {
+        mCustomSerializers = serializers;
+        mDbPath = dbFilesDir + File.separator + dbName;
+    }
+
     public synchronized void destroy() {
         assertInit();
 
