@@ -31,40 +31,35 @@ Paper.init(context);
 * All other APIs (`write`, `read` etc.) are thread-safe and obviously must be called outside of UI thread. Since of v2.6 simultaneous reading/writing for different `key`s significantly improves the performance (up to 97% per thread). 
  
 ### Save
-Save any data objects, Map, List, HashMap etc. including all the internal data hierarchy. 
+Save any object, Map, List, HashMap etc. including all internal objects. 
 Paper creates separate data file for each key.
 
 ```java
-Paper.book().write("city", "Lund"); // Object
-Paper.book().write("task-queue", queue); // LinkedList
-Paper.book().write("countries", countryCodeMap); // HashMap etc.
+List<Person> contacts = ...
+Paper.book().write("contacts", contacts);
 ```
 
 ### Read
 Read data objects, the instantiated class is exactly the one used to save data. Limited changes to the class structure are handled automatically. See [Handle data class changes](#handle-data-structure-changes).
 
 ```java
-String city = Paper.book().read("city");
-LinkedList queue = Paper.book().read("task-queue");
-HashMap countryCodeMap = Paper.book().read("countries");
+List<Person> = Paper.book().read("contacts");
 ```
 
 Use default values if object doesn't exist in the storage.
 
 ```java
-String city = Paper.book().read("city", "Kyiv");
-LinkedList queue = Paper.book().read("task-queue", new LinkedList());
-HashMap countryCodeMap = Paper.book().read("countries", new HashMap());
+List<Person> = Paper.book().read("contacts", new ArrayList<>());
 ```
 
 ### Delete
 Delete data for one key.
 
 ```java
-Paper.book().delete("countries");
+Paper.book().delete("contacts");
 ```
 
-Completely destroys Paper storage. Requires to call ```Paper.init()``` before usage.
+Remove all keys for the given Book. ```Paper.init()``` must be called prior calling `destroy()`.
 
 ```java
 Paper.book().destroy();
@@ -74,14 +69,15 @@ Paper.book().destroy();
 You can create custom Book with separate storage using
 
 ```java
-Paper.book("custom-book")...;
+Paper.book("for-user-1").write("contacts", contacts);
+Paper.book("for-user-2").write("contacts", contacts);
 ```
-Each book is located in separate file folder.
+Each book is located in a separate file folder.
 
 ### Get all keys 
 Returns all keys for objects in the book.
 
-```
+```java
 List<String> allKeys = Paper.book().getAllKeys();
 ```
 
@@ -105,7 +101,7 @@ class Volcano {
 }
 ```
 
-Then on restore the _isActive_ field will be ignored and new _location_ field will have its default value _null_.
+the _isActive_ field will be ignored on next read and new _location_ field will have its default value as _null_.
 
 ### Exclude fields
 Use _transient_ keyword for fields which you want to exclude from saving process.
@@ -113,6 +109,11 @@ Use _transient_ keyword for fields which you want to exclude from saving process
 ```java
 public transient String tempId = "default"; // Won't be saved
 ```
+
+### Set storage location for Book instances
+By default, all the Paper data files are located with all files belonging to your app, at `../you-app-package-name/files`. To save data on SDCard or at any other location you can use new API:
+* `Paper.bookOn("path-to-the-new-location")`
+* or `Paper.bookOn("path-to-the-new-location", "book-for-user-1")` to create custom book. 
 
 ### Export/Import
 * Use `Paper.book().getPath()` to get path for a folder containing all *.pt files for a given book.
