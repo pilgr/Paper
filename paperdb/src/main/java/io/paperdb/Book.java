@@ -101,7 +101,7 @@ public class Book {
      * file modification time only in seconds.
      *
      * @param key object key
-     * @return timestamp of last write for given key in ms if it contains, otherwise -1
+     * @return timestamp of last write for given key in ms if it exists, otherwise -1
      */
     public long lastModified(String key) {
         return mStorage.lastModified(key);
