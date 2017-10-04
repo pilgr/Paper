@@ -44,8 +44,8 @@ public class CustomBookTest {
         assertEquals("Kyiv", Paper.book(custom).read("city"));
 
         Paper.book().delete("city");
-        assertFalse(Paper.book().exists("city"));
-        assertTrue(Paper.book(custom).exists("city"));
+        assertFalse(Paper.book().contains("city"));
+        assertTrue(Paper.book(custom).contains("city"));
     }
 
 
