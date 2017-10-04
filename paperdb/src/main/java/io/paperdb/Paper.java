@@ -141,7 +141,7 @@ public class Paper {
      * @deprecated use Paper.book().exist()
      */
     public static boolean exist(String key) {
-        return book().exists(key);
+        return book().contains(key);
     }
 
     /**

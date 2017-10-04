@@ -78,9 +78,9 @@ public class Book {
      * Checks if an object with the given key is saved in Book storage.
      *
      * @param key object key
-     * @return true if object with given key exists in Book storage, false otherwise
+     * @return true if Book storage contains an object with given key, false otherwise
      */
-    public boolean exists(String key) {
+    public boolean contains(String key) {
         return mStorage.exists(key);
     }
 
@@ -89,7 +89,7 @@ public class Book {
      *
      * @param key object key
      * @return true if object with given key exists in Book storage, false otherwise
-     * @deprecated As of release 2.6, replaced by {@link #exists(String)}}
+     * @deprecated As of release 2.6, replaced by {@link #contains(String)}}
      */
     public boolean exist(String key) {
         return mStorage.exists(key);
@@ -101,7 +101,7 @@ public class Book {
      * file modification time only in seconds.
      *
      * @param key object key
-     * @return timestamp of last write for given key in ms if it exists, otherwise -1
+     * @return timestamp of last write for given key in ms if it contains, otherwise -1
      */
     public long lastModified(String key) {
         return mStorage.lastModified(key);

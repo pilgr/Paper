@@ -40,7 +40,7 @@ public class CustomBookLocationTest {
 
         bookOnSdcard.delete("city");
 
-        assertFalse(bookOnSdcard.exists("city"));
+        assertFalse(bookOnSdcard.contains("city"));
         assertEquals("Kyiv", defaultBook.read("city"));
     }
 
@@ -61,7 +61,7 @@ public class CustomBookLocationTest {
 
         bookOnSdcard.delete("city");
 
-        assertFalse(bookOnSdcard.exists("city"));
+        assertFalse(bookOnSdcard.contains("city"));
         assertEquals("Kyiv", defaultBook.read("city"));
     }
 

@@ -55,26 +55,26 @@ public class MultiThreadTest {
 
     @Test
     public void write_exists_same_key() throws InterruptedException {
-        assertFalse(Paper.book().exists("dataset"));
+        assertFalse(Paper.book().contains("dataset"));
 
         startWritingLargeDataSetInSeparateThread("dataset");
 
-        Log.d(TAG, "check dataset exists: start");
+        Log.d(TAG, "check dataset contains: start");
         // Read for same key 'dataset' should be postponed until writing is done
-        assertTrue(Paper.book().exists("dataset"));
-        Log.d(TAG, "check dataset exists: finish");
+        assertTrue(Paper.book().contains("dataset"));
+        Log.d(TAG, "check dataset contains: finish");
     }
 
     @Test
     public void write_delete_same_key() throws InterruptedException {
-        assertFalse(Paper.book().exists("dataset"));
+        assertFalse(Paper.book().contains("dataset"));
 
         startWritingLargeDataSetInSeparateThread("dataset");
 
         Log.d(TAG, "check dataset delete: start");
         // Read for same key 'dataset' should be postponed until writing is done
         Paper.book().delete("dataset");
-        assertFalse(Paper.book().exists("dataset"));
+        assertFalse(Paper.book().contains("dataset"));
         Log.d(TAG, "check dataset delete: finish");
     }
 
