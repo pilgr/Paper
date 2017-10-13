@@ -112,8 +112,8 @@ public transient String tempId = "default"; // Won't be saved
 
 ### Set storage location for Book instances
 By default, all the Paper data files are located with all files belonging to your app, at `../you-app-package-name/files`. To save data on SDCard or at any other location you can use new API:
-* `Paper.bookOn("path-to-the-new-location")`
-* or `Paper.bookOn("path-to-the-new-location", "book-for-user-1")` to create custom book. 
+* `Paper.bookOn("/path/to/the/new/location")`
+* or `Paper.bookOn("path/to/the/new/location", "book-for-user-1")` to create custom book. 
 
 ### Export/Import
 * Use `Paper.book().getPath()` to get path for a folder containing all *.pt files for a given book.
