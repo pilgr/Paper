@@ -159,6 +159,7 @@ Running [Benchmark](https://github.com/pilgr/Paper/blob/master/paperdb/src/andro
 
 ### Apps using Paper
 - [AppDialer](https://play.google.com/store/apps/details?id=name.pilgr.appdialer) – Paper initially has been developed as internal lib to reduce start up time for AppDialer. Currently AppDialer has the best start up time in its class. And simple no-sql-pain data storage layer like a bonus.
+- [Busmap](https://play.google.com/store/apps/details?id=com.t7.busmap&hl=en) - This application provide all things you need for travelling by bus in Ho Chi Minh city, Vietnam. While the source code is not opened, it is found that the application use Paper internally to manange the bus stop data, route data, time data,... and more.
 
 ### License
     Copyright 2015 Aleksey Masny
