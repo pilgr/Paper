@@ -1,6 +1,20 @@
 Change Log
 ==========
 
+Version 2.6 *(2017-10-21)*
+----------------------------
+
+New API:
+* `Paper.bookOn(path)` to set custom storage location;
+* `book.getPath()` or `book.getPath(key)` to get path for content of book or key.
+    
+Improvements:
+* simultaneous read/write for different keys, up to 97% performance gain per thread.
+* name change: use `book.contains(key)` instead of deprecated `book.exist(key)`
+    
+Thanks [@hiperioncn](https://github.com/hiperioncn) and [cezar-carneiro](https://github.com/cezar-carneiro) for your contribution!
+
+
 Version 2.5 *(2017-09-21)*
 ----------------------------
 
