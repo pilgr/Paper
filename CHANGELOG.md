@@ -12,7 +12,7 @@ Improvements:
 * simultaneous read/write for different keys, up to 97% performance gain per thread.
 * name change: use `book.contains(key)` instead of deprecated `book.exist(key)`
     
-Thanks [@hiperioncn](https://github.com/hiperioncn) and [cezar-carneiro](https://github.com/cezar-carneiro) for your contribution!
+Thanks [@hiperioncn](https://github.com/hiperioncn) and [@cezar-carneiro](https://github.com/cezar-carneiro) for your contribution!
 
 
 Version 2.5 *(2017-09-21)*
