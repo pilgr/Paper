@@ -1,4 +1,4 @@
-package io.paperdb.testdata;
+package paperdb.io.paperdb.testdata;
 
 import android.support.annotation.NonNull;
 
@@ -12,15 +12,6 @@ public class TestDataGenerator {
         List<Person> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Person p = genPerson(new Person(), i);
-            list.add(p);
-        }
-        return list;
-    }
-
-    public static List<PersonArg> genPersonArgList(int size) {
-        List<PersonArg> list = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            PersonArg p = genPerson(new PersonArg("name"), i);
             list.add(p);
         }
         return list;

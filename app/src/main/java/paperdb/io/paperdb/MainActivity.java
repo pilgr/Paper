@@ -2,7 +2,6 @@ package paperdb.io.paperdb;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
                 LongHolder o1 = Paper.book().read("o1", new LongHolder(-1L));
                 LongListHolder o2 = Paper.book().read("o2", new LongListHolder(asList(-1L)));
 
-                long lastModified = Paper.book().lastModified("o1");
-                Log.d(TAG, "lastModified: " + lastModified);
+                //long lastModified = Paper.book().lastModified("o1");
+                //Log.d(TAG, "lastModified: " + lastModified);
 
                 btnRead.setText("Read: " + o1.getValue() + " : " + o2.getValue().get(0));
             }

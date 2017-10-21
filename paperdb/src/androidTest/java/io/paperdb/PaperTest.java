@@ -34,23 +34,23 @@ public class PaperTest {
     }
 
     @Test
-    public void testExist() throws Exception {
-        assertFalse(Paper.book().exist("persons"));
+    public void testContains() throws Exception {
+        assertFalse(Paper.book().contains("persons"));
         Paper.book().write("persons", TestDataGenerator.genPersonList(10));
-        assertTrue(Paper.book().exist("persons"));
+        assertTrue(Paper.book().contains("persons"));
     }
 
     @Test
     public void testDelete() throws Exception {
         Paper.book().write("persons", TestDataGenerator.genPersonList(10));
-        assertTrue(Paper.book().exist("persons"));
+        assertTrue(Paper.book().contains("persons"));
         Paper.book().delete("persons");
-        assertFalse(Paper.book().exist("persons"));
+        assertFalse(Paper.book().contains("persons"));
     }
 
     @Test
     public void testDeleteNotExisted() throws Exception {
-        assertFalse(Paper.book().exist("persons"));
+        assertFalse(Paper.book().contains("persons"));
         Paper.book().delete("persons");
     }
 
@@ -58,17 +58,17 @@ public class PaperTest {
     public void testClear() throws Exception {
         Paper.book().write("persons", TestDataGenerator.genPersonList(10));
         Paper.book().write("persons2", TestDataGenerator.genPersonList(20));
-        assertTrue(Paper.book().exist("persons"));
-        assertTrue(Paper.book().exist("persons2"));
+        assertTrue(Paper.book().contains("persons"));
+        assertTrue(Paper.book().contains("persons2"));
 
         Paper.book().destroy();
         // init() call is not required after clear()
-        assertFalse(Paper.book().exist("persons"));
-        assertFalse(Paper.book().exist("persons2"));
+        assertFalse(Paper.book().contains("persons"));
+        assertFalse(Paper.book().contains("persons2"));
 
         // Should be possible to continue to use Paper after clear()
         Paper.book().write("persons3", TestDataGenerator.genPersonList(30));
-        assertTrue(Paper.book().exist("persons3"));
+        assertTrue(Paper.book().contains("persons3"));
         assertThat(Paper.book().<List>read("persons3")).hasSize(30);
     }
 
@@ -180,10 +180,10 @@ public class PaperTest {
     @Test
     public void testCustomSerializer() {
         Paper.addSerializer(DateTime.class, new JodaDateTimeSerializer());
-
         DateTime now = DateTime.now(DateTimeZone.UTC);
-        Paper.book("custom").write("joda-datetime", now);
-        assertEquals(Paper.book("custom").read("joda-datetime"), now);
+
+        Paper.book().write("joda-datetime", now);
+        assertEquals(now, Paper.book().read("joda-datetime"));
     }
 
     @Test
@@ -226,10 +226,10 @@ public class PaperTest {
     @Test
     public void testDbFileExistsAfterFailedRead() throws IOException {
         String key = "cityMap";
-        assertFalse(Paper.book().exist(key));
+        assertFalse(Paper.book().contains(key));
 
         TestUtils.replacePaperDbFileBy("invalid_data.pt", key);
-        assertTrue(Paper.book().exist(key));
+        assertTrue(Paper.book().contains(key));
 
         Throwable expectedException = null;
         try {
@@ -239,7 +239,19 @@ public class PaperTest {
         }
         assertNotNull(expectedException);
         // Data file should exist even if previous read attempt was failed
-        assertTrue(Paper.book().exist(key));
+        assertTrue(Paper.book().contains(key));
+    }
+
+    @Test
+    public void getFolderPathForBook_default() {
+        String path = Paper.book().getPath();
+        assertTrue(path.endsWith("/io.paperdb.test/files/io.paperdb"));
+    }
+
+    @Test
+    public void getFilePathForKey_defaultBook() {
+        String path = Paper.book().getPath("my_key");
+        assertTrue(path.endsWith("/io.paperdb.test/files/io.paperdb/my_key.pt"));
     }
 
 }
