@@ -5,22 +5,21 @@ Paper is a [fast](#benchmark-results) NoSQL-like storage for Java/Kotlin objects
 
 ![Paper icon](/paper_icon.png)
 
-### What's [new](/CHANGELOG.md) in 2.5
-(!) This update contains critical fixes, please update your project ASAP!
-* Fixed crash on reading data saved with Paper 1.x.
-* Fixed potential data loss on failed read attempt. 
+### What's [new](/CHANGELOG.md) in 2.6
 
-### What's [new](/CHANGELOG.md) in 2.1
-* Fixed exception potentially causing data corruption on Android N+ (for targetSdkVersion=25+);
-* New API: 
-    * `book.lastModified(key)` to get last data modification timestamp;
-    * `Paper.setLogLevel()` or `book.setLogLevel()` to set log level for internal Kryo serializer;
-
-Thanks @aaronpoweruser and @fiskurgit for contrib!
+New API:
+* `Paper.bookOn(path)` to set custom storage location;
+* `book.getPath()` or `book.getPath(key)` to get path for content of book or key.
+    
+Improvements:
+* simultaneous read/write for different keys, up to 97% performance gain per thread.
+* name change: use `book.contains(key)` instead of deprecated `book.exist(key)`
+    
+Thanks [@hiperioncn](https://github.com/hiperioncn) and [@cezar-carneiro](https://github.com/cezar-carneiro) for your contribution!
 
 ### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:2.5'
+compile 'io.paperdb:paperdb:2.6'
 ```
 
 ### Initialize Paper
@@ -30,43 +29,40 @@ Should be initialized one time in onCreate() in Application or Activity.
 Paper.init(context);
 ```
 
-It's OK to call it in UI thread. All other methods should be used in background.
-
+### Threading
+* `Paper.init()` should be called in UI thread; 
+* All other APIs (`write`, `read` etc.) are thread-safe and obviously must be called outside of UI thread. Beginning of v2.6 reading/writing for different `key`s done simultaneously. 
+ 
 ### Save
-Save any data objects, Map, List, HashMap etc. including all the internal data hierarchy. 
-Paper creates separate data file for each key.
+Save any object, Map, List, HashMap etc. including all internal objects. Use your existing data classes as is.
 
 ```java
-Paper.book().write("city", "Lund"); // Object
-Paper.book().write("task-queue", queue); // LinkedList
-Paper.book().write("countries", countryCodeMap); // HashMap etc.
+List<Person> contacts = ...
+Paper.book().write("contacts", contacts);
 ```
 
 ### Read
-Read data objects, the instantiated class is exactly the one used to save data. Limited changes to the class structure are handled automatically. See [Handle data class changes](#handle-data-structure-changes).
+Read data objects is as easy as
 
 ```java
-String city = Paper.book().read("city");
-LinkedList queue = Paper.book().read("task-queue");
-HashMap countryCodeMap = Paper.book().read("countries");
+List<Person> = Paper.book().read("contacts");
 ```
+the instantiated class is exactly the one used to save data. Limited changes to the class structure are handled automatically. See [Handle data class changes](#handle-data-structure-changes).
 
 Use default values if object doesn't exist in the storage.
 
 ```java
-String city = Paper.book().read("city", "Kyiv");
-LinkedList queue = Paper.book().read("task-queue", new LinkedList());
-HashMap countryCodeMap = Paper.book().read("countries", new HashMap());
+List<Person> = Paper.book().read("contacts", new ArrayList<>());
 ```
 
 ### Delete
 Delete data for one key.
 
 ```java
-Paper.book().delete("countries");
+Paper.book().delete("contacts");
 ```
 
-Completely destroys Paper storage. Requires to call ```Paper.init()``` before usage.
+Remove all keys for the given Book. ```Paper.init()``` must be called prior calling `destroy()`.
 
 ```java
 Paper.book().destroy();
@@ -76,14 +72,15 @@ Paper.book().destroy();
 You can create custom Book with separate storage using
 
 ```java
-Paper.book("custom-book")...;
+Paper.book("for-user-1").write("contacts", contacts);
+Paper.book("for-user-2").write("contacts", contacts);
 ```
-Each book is located in separate file folder.
+Each book is located in a separate file folder.
 
 ### Get all keys 
 Returns all keys for objects in the book.
 
-```
+```java
 List<String> allKeys = Paper.book().getAllKeys();
 ```
 
@@ -107,7 +104,7 @@ class Volcano {
 }
 ```
 
-Then on restore the _isActive_ field will be ignored and new _location_ field will have its default value _null_.
+the _isActive_ field will be ignored on next read and new _location_ field will have its default value as _null_.
 
 ### Exclude fields
 Use _transient_ keyword for fields which you want to exclude from saving process.
@@ -115,6 +112,17 @@ Use _transient_ keyword for fields which you want to exclude from saving process
 ```java
 public transient String tempId = "default"; // Won't be saved
 ```
+
+### Set storage location for Book instances
+By default, all the Paper data files are located with all files belonging to your app, at `../you-app-package-name/files`. To save data on SDCard or at any other location you can use new API:
+* `Paper.bookOn("/path/to/the/new/location")`
+* or `Paper.bookOn("path/to/the/new/location", "book-for-user-1")` to create custom book. 
+
+### Export/Import
+* Use `Paper.book().getPath()` to get path for a folder containing all *.pt files for a given book.
+* Use `Paper.book().getPath(key)` to get path for a particular *.pt file containing saved object for a given key.
+ Feel free to copy/rewrite those files for export/import purposes. It's your responsibility to finalize file's export/import operations prior accessing data over Paper API.
+
 ### Proguard config
 * Keep your data classes from modification by Proguard:
 
@@ -151,6 +159,7 @@ Running [Benchmark](https://github.com/pilgr/Paper/blob/master/paperdb/src/andro
 
 ### Apps using Paper
 - [AppDialer](https://play.google.com/store/apps/details?id=name.pilgr.appdialer) – Paper initially has been developed as internal lib to reduce start up time for AppDialer. Currently AppDialer has the best start up time in its class. And simple no-sql-pain data storage layer like a bonus.
+- [Busmap](https://play.google.com/store/apps/details?id=com.t7.busmap&hl=en) - This application provide all things you need for travelling by bus in Ho Chi Minh city, Vietnam. While the source code is not opened, it is found that the application use Paper internally to manange the bus stop data, route data, time data,... and more.
 
 ### License
     Copyright 2015 Aleksey Masny
