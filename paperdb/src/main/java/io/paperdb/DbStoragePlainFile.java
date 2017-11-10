@@ -278,7 +278,7 @@ public class DbStoragePlainFile {
                     "Backed up table will be used on next read attempt", e);
         } finally {
             if (kryoOutput != null) {
-                kryoOutput.close();  // closing opened kryo output
+                kryoOutput.close();  // closing opened kryo output with initial file stream.
             }
         }
     }
