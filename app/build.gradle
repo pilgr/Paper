@@ -24,8 +24,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:26.1.0'
-    compile project(':paperdb')
-    //compile 'io.paperdb:paperdb:2.5'
+    //compile project(':paperdb')
+    compile 'io.paperdb:paperdb:2.6'
 
     androidTestCompile('com.android.support.test:runner:0.5') {
         exclude group: 'com.android.support', module: 'support-annotations'

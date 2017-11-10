@@ -5,18 +5,21 @@ Paper is a [fast](#benchmark-results) NoSQL-like storage for Java/Kotlin objects
 
 ![Paper icon](/paper_icon.png)
 
-### What's [new](/CHANGELOG.md) in 2.5
-* 
-Thanks [@hiperioncn](https://github.com/hiperioncn) for your contribution!
+### What's [new](/CHANGELOG.md) in 2.6
 
-### What's [new](/CHANGELOG.md) in 2.5
-(!) This update contains critical fixes, please update your project ASAP!
-* Fixed crash on reading data saved with Paper 1.x.
-* Fixed potential data loss on failed read attempt. 
+New API:
+* `Paper.bookOn(path)` to set custom storage location;
+* `book.getPath()` or `book.getPath(key)` to get path for content of book or key.
+    
+Improvements:
+* simultaneous read/write for different keys, up to 97% performance gain per thread.
+* name change: use `book.contains(key)` instead of deprecated `book.exist(key)`
+    
+Thanks [@hiperioncn](https://github.com/hiperioncn) and [@cezar-carneiro](https://github.com/cezar-carneiro) for your contribution!
 
 ### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:2.5'
+compile 'io.paperdb:paperdb:2.6'
 ```
 
 ### Initialize Paper
@@ -28,11 +31,10 @@ Paper.init(context);
 
 ### Threading
 * `Paper.init()` should be called in UI thread; 
-* All other APIs (`write`, `read` etc.) are thread-safe and obviously must be called outside of UI thread. Since of v2.6 simultaneous reading/writing for different `key`s significantly improves the performance (up to 97% per thread). 
+* All other APIs (`write`, `read` etc.) are thread-safe and obviously must be called outside of UI thread. Beginning of v2.6 reading/writing for different `key`s done simultaneously. 
  
 ### Save
-Save any object, Map, List, HashMap etc. including all internal objects. 
-Paper creates separate data file for each key.
+Save any object, Map, List, HashMap etc. including all internal objects. Use your existing data classes as is.
 
 ```java
 List<Person> contacts = ...
@@ -40,11 +42,12 @@ Paper.book().write("contacts", contacts);
 ```
 
 ### Read
-Read data objects, the instantiated class is exactly the one used to save data. Limited changes to the class structure are handled automatically. See [Handle data class changes](#handle-data-structure-changes).
+Read data objects is as easy as
 
 ```java
 List<Person> = Paper.book().read("contacts");
 ```
+the instantiated class is exactly the one used to save data. Limited changes to the class structure are handled automatically. See [Handle data class changes](#handle-data-structure-changes).
 
 Use default values if object doesn't exist in the storage.
 
@@ -156,6 +159,7 @@ Running [Benchmark](https://github.com/pilgr/Paper/blob/master/paperdb/src/andro
 
 ### Apps using Paper
 - [AppDialer](https://play.google.com/store/apps/details?id=name.pilgr.appdialer) – Paper initially has been developed as internal lib to reduce start up time for AppDialer. Currently AppDialer has the best start up time in its class. And simple no-sql-pain data storage layer like a bonus.
+- [Busmap](https://play.google.com/store/apps/details?id=com.t7.busmap&hl=en) - This application provide all things you need for travelling by bus in Ho Chi Minh city, Vietnam. While the source code is not opened, it is found that the application use Paper internally to manange the bus stop data, route data, time data,... and more.
 
 ### License
     Copyright 2015 Aleksey Masny
