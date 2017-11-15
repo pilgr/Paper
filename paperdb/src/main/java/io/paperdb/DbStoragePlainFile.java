@@ -254,15 +254,16 @@ public class DbStoragePlainFile {
      */
     private <E> void writeTableFile(String key, PaperTable<E> paperTable,
                                     File originalFile, File backupFile) {
+        Output kryoOutput = null;
         try {
             FileOutputStream fileStream = new FileOutputStream(originalFile);
-
-            final Output kryoOutput = new Output(fileStream);
+            kryoOutput = new Output(fileStream);
             getKryo().writeObject(kryoOutput, paperTable);
             kryoOutput.flush();
             fileStream.flush();
             sync(fileStream);
             kryoOutput.close(); //also close file stream
+            kryoOutput = null;
 
             // Writing was successful, delete the backup file if there is one.
             //noinspection ResultOfMethodCallIgnored
@@ -277,6 +278,10 @@ public class DbStoragePlainFile {
             }
             throw new PaperDbException("Couldn't save table: " + key + ". " +
                     "Backed up table will be used on next read attempt", e);
+        } finally {
+            if (kryoOutput != null) {
+                kryoOutput.close();  // closing opened kryo output with initial file stream.
+            }
         }
     }
 
