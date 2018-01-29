@@ -85,7 +85,13 @@ List<String> allKeys = Paper.book().getAllKeys();
 ```
 
 ### Handle data structure changes
-Class fields which has been removed will be ignored on restore and new fields will have their default values. For example, if you have following data class saved in Paper storage:
+You can add or remove fields to the class. Then on next read attempt of a new class:
+* Newly added fields will have their default values. 
+* Removed field will be ignored. 
+
+*Note:* field type changes are not supported.
+
+For example, if you have following data class saved in Paper storage:
 
 ```java
 class Volcano {
