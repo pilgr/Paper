@@ -22,8 +22,10 @@ Thanks [@hiperioncn](https://github.com/hiperioncn) and [@cezar-carneiro](https:
 compile 'io.paperdb:paperdb:2.6'
 ```
 
+RxJava wrapper for Paper is available as a separate lib [RxPaper2](https://github.com/pakoito/RxPaper2). Thanks [@pakoito](https://github.com/pakoito) for it!
+
 ### Initialize Paper
-Should be initialized one time in onCreate() in Application or Activity.
+Should be initialized once in `Application.onCreate()`:
 
 ```java
 Paper.init(context);
@@ -31,7 +33,7 @@ Paper.init(context);
 
 ### Threading
 * `Paper.init()` should be called in UI thread; 
-* All other APIs (`write`, `read` etc.) are thread-safe and obviously must be called outside of UI thread. Beginning of v2.6 reading/writing for different `key`s done simultaneously. 
+* All other APIs (`write`, `read` etc.) are thread-safe and obviously must be called outside of UI thread. Reading/writing for different `key`s can be done in parallel. 
  
 ### Save
 Save any object, Map, List, HashMap etc. including all internal objects. Use your existing data classes as is.
