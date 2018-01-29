@@ -156,11 +156,11 @@ The [Kryo](https://github.com/EsotericSoftware/kryo) is used for object graph se
 ### Benchmark results
 Running [Benchmark](https://github.com/pilgr/Paper/blob/master/paperdb/src/androidTest/java/io/paperdb/benchmark/Benchmark.java) on Nexus 4, in ms:
 
-| Benchmark                 | Paper    | [Hawk](https://github.com/orhanobut/hawk) | [sqlite](http://developer.android.com/reference/android/database/sqlite/package-summary.html) |
-|---------------------------|----------|----------|----------|
-| Read/write 500 contacts   | 187      | 447      |          |
-| Write 500 contacts        | 108      | 221      |          |
-| Read 500 contacts         | 79       | 155      |          |
+| Benchmark                 | Paper    | [Hawk](https://github.com/orhanobut/hawk) |
+|---------------------------|----------|----------|
+| Read/write 500 contacts   | 187      | 447      |
+| Write 500 contacts        | 108      | 221      |
+| Read 500 contacts         | 79       | 155      |
 
 ### Limitations
 * Circular references are not supported
