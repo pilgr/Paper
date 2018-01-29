@@ -5,7 +5,7 @@ Paper is a [fast](#benchmark-results) NoSQL-like storage for Java/Kotlin objects
 
 ![Paper icon](/paper_icon.png)
 
-### What's [new](/CHANGELOG.md) in 2.6
+#### What's [new](/CHANGELOG.md) in 2.6
 
 New API:
 * `Paper.bookOn(path)` to set custom storage location;
