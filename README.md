@@ -1,7 +1,7 @@
 # Paper
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Paper-blue.svg?style=flat)](http://android-arsenal.com/details/1/2080)   [![Build Status](https://travis-ci.org/pilgr/Paper.svg?branch=master)](https://travis-ci.org/pilgr/Paper)
 
-Paper is a [fast](#benchmark-results) NoSQL-like storage for Java/Kotlin objects on Android with automatic schema migration support.
+Paper is a [fast](#benchmark-results) NoSQL-like storage for Java/Kotlin objects on Android with automatic schema migration support. Paper's aim is to provide simple yet fast object storage option for Android. It allows use clasess as is, without annotations, factory methods, mandatory class extensions etc.
 
 ![Paper icon](/paper_icon.png)
 
