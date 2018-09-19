@@ -4,7 +4,6 @@
 -keep class de.javakaffee.kryoserializers.** { *; }
 -dontwarn de.javakaffee.kryoserializers.**
 
-
 #kryo
 -dontwarn sun.reflect.**
 -dontwarn java.beans.**
