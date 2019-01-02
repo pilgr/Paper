@@ -19,7 +19,7 @@ Thanks [@hiperioncn](https://github.com/hiperioncn) and [@cezar-carneiro](https:
 
 ### Add dependency
 ```groovy
-compile 'io.paperdb:paperdb:2.6'
+implementation 'io.paperdb:paperdb:2.6'
 ```
 
 RxJava wrapper for Paper is available as a separate lib [RxPaper2](https://github.com/pakoito/RxPaper2). Thanks [@pakoito](https://github.com/pakoito) for it!
