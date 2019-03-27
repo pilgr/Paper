@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ import io.paperdb.serializer.NoArgCollectionSerializer;
 import static io.paperdb.Paper.TAG;
 
 public class DbStoragePlainFile {
+    private static final String BACKUP_EXTENSION = ".bak";
 
     private final String mDbPath;
     private final HashMap<Class, Serializer> mCustomSerializers;
@@ -193,7 +195,12 @@ public class DbStoragePlainFile {
         assertInit();
 
         File bookFolder = new File(mDbPath);
-        String[] names = bookFolder.list();
+        String[] names = bookFolder.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File file, String s) {
+                return !s.endsWith(BACKUP_EXTENSION);
+            }
+        });
         if (names != null) {
             //remove extensions
             for (int i = 0; i < names.length; i++) {
@@ -346,7 +353,7 @@ public class DbStoragePlainFile {
     }
 
     private File makeBackupFile(File originalFile) {
-        return new File(originalFile.getPath() + ".bak");
+        return new File(originalFile.getPath() + BACKUP_EXTENSION);
     }
 
     /**
