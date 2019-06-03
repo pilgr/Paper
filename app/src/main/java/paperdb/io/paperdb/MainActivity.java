@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LongHolder o1 = new LongHolder(12L);
                 LongListHolder o2 = new LongListHolder(asList(23L));
-                Paper.book().write("o1", o1);
-                Paper.book().write("o2", o2);
+                Paper.book(true).write("o1", o1);
+                Paper.book(true).write("o2", o2);
             }
         });
 
@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
         btnRead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LongHolder o1 = Paper.book().read("o1", new LongHolder(-1L));
-                LongListHolder o2 = Paper.book().read("o2", new LongListHolder(asList(-1L)));
+                LongHolder o1 = Paper.book(true).read("o1", new LongHolder(-1L));
+                LongListHolder o2 = Paper.book(true).read("o2", new LongListHolder(asList(-1L)));
 
                 //long lastModified = Paper.book().lastModified("o1");
                 //Log.d(TAG, "lastModified: " + lastModified);

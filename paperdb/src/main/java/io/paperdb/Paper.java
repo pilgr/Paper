@@ -45,6 +45,7 @@ public class Paper {
      */
     public static void init(Context context) {
         mContext = context.getApplicationContext();
+        DependenciesProvider.getInstance().setApplicationContext(context);
     }
 
     /**
@@ -60,12 +61,35 @@ public class Paper {
     }
 
     /**
+     * Returns book instance with the given name
+     *
+     * @param name name of new database
+     * @param encrypted whether to encrypt database
+     * @return Paper instance
+     */
+    public static Book book(String name, boolean encrypted) {
+        if (name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
+                " name is reserved for default library name");
+        return getBook(null, name, encrypted);
+    }
+
+    /**
      * Returns default book instance
      *
      * @return Book instance
      */
     public static Book book() {
         return getBook(null, DEFAULT_DB_NAME);
+    }
+
+    /**
+     * Returns default book instance
+     *
+     * @param encrypted whether to encrypt database
+     * @return Book instance
+     */
+    public static Book book(boolean encrypted) {
+        return getBook(null, DEFAULT_DB_NAME, encrypted);
     }
 
     /**
@@ -84,6 +108,19 @@ public class Paper {
      * Returns book instance to save data at custom location, e.g. on sdcard.
      *
      * @param location the path to a folder where the book's folder will be placed
+     * @param name     the name of the book
+     * @param encrypted whether to encrypt database
+     * @return book instance
+     */
+    public static Book bookOn(String location, String name, Boolean encrypted) {
+        location = removeLastFileSeparatorIfExists(location);
+        return getBook(location, name, encrypted);
+    }
+
+    /**
+     * Returns book instance to save data at custom location, e.g. on sdcard.
+     *
+     * @param location the path to a folder where the book's folder will be placed
      * @return book instance
      */
     public static Book bookOn(String location) {
@@ -91,6 +128,10 @@ public class Paper {
     }
 
     private static Book getBook(String location, String name) {
+        return getBook(location, name, false);
+    }
+
+    private static Book getBook(String location, String name, Boolean encrypted) {
         if (mContext == null) {
             throw new PaperDbException("Paper.init is not called");
         }
@@ -99,9 +140,9 @@ public class Paper {
             Book book = mBookMap.get(key);
             if (book == null) {
                 if (location == null) {
-                    book = new Book(mContext, name, mCustomSerializers);
+                    book = new Book(mContext, name, mCustomSerializers, encrypted);
                 } else {
-                    book = new Book(location, name, mCustomSerializers);
+                    book = new Book(location, name, mCustomSerializers, encrypted);
                 }
                 mBookMap.put(key, book);
             }

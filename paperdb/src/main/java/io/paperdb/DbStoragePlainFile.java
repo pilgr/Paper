@@ -12,18 +12,30 @@ import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import de.javakaffee.kryoserializers.ArraysAsListSerializer;
 import de.javakaffee.kryoserializers.SynchronizedCollectionsSerializer;
@@ -36,10 +48,12 @@ import static io.paperdb.Paper.TAG;
 public class DbStoragePlainFile {
     private static final String BACKUP_EXTENSION = ".bak";
 
+    private final boolean mEncryptionEnabled;
     private final String mDbPath;
     private final HashMap<Class, Serializer> mCustomSerializers;
     private volatile boolean mPaperDirIsCreated;
     private KeyLocker keyLocker = new KeyLocker(); // To sync key-dependent operations by key
+    private KryoCypher kryoCypher = null;
 
     private Kryo getKryo() {
         return mKryo.get();
@@ -60,6 +74,7 @@ public class DbStoragePlainFile {
         }
 
         kryo.register(PaperTable.class);
+        kryo.register(byte[].class);
         kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
         kryo.setReferences(false);
 
@@ -85,19 +100,31 @@ public class DbStoragePlainFile {
         kryo.setInstantiatorStrategy(
                 new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
 
+        if (mEncryptionEnabled) {
+            try {
+                kryoCypher = new KryoCypher(mDbPath, kryo);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Log.e("Paper", "Error constructing KryoCypher");
+                throw new IllegalStateException(ex);
+            }
+        }
+
         return kryo;
     }
 
     DbStoragePlainFile(Context context, String dbName,
-                       HashMap<Class, Serializer> serializers) {
+                       HashMap<Class, Serializer> serializers, Boolean encrypted) {
         mCustomSerializers = serializers;
         mDbPath = context.getFilesDir() + File.separator + dbName;
+        mEncryptionEnabled = encrypted;
     }
 
     DbStoragePlainFile(String dbFilesDir, String dbName,
-                       HashMap<Class, Serializer> serializers) {
+                       HashMap<Class, Serializer> serializers, Boolean encrypted) {
         mCustomSerializers = serializers;
         mDbPath = dbFilesDir + File.separator + dbName;
+        mEncryptionEnabled = encrypted;
     }
 
     public synchronized void destroy() {
@@ -265,7 +292,18 @@ public class DbStoragePlainFile {
             FileOutputStream fileStream = new FileOutputStream(originalFile);
 
             final Output kryoOutput = new Output(fileStream);
-            getKryo().writeObject(kryoOutput, paperTable);
+            if (mEncryptionEnabled) {
+                byte[] encryptedBytes;
+                try {
+                    encryptedBytes = getKryoCypher().encrypt(key, paperTable);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException("Could encrypt object", ex);
+                }
+                getKryo().writeObject(kryoOutput, encryptedBytes);
+            } else {
+                getKryo().writeObject(kryoOutput, paperTable);
+            }
             kryoOutput.flush();
             fileStream.flush();
             sync(fileStream);
@@ -287,15 +325,20 @@ public class DbStoragePlainFile {
         }
     }
 
+    private KryoCypher getKryoCypher() {
+        getKryo();
+        return kryoCypher;
+    }
+
     private <E> E readTableFile(String key, File originalFile) {
         try {
-            return readContent(originalFile, getKryo());
+            return readContent(key, originalFile, getKryo());
         } catch (FileNotFoundException | KryoException | ClassCastException e) {
             Throwable exception = e;
             // Give one more chance, read data in paper 1.x compatibility mode
             if (e instanceof KryoException) {
                 try {
-                    return readContent(originalFile, createKryoInstance(true));
+                    return readContent(key, originalFile, createKryoInstance(true));
                 } catch (FileNotFoundException | KryoException | ClassCastException compatibleReadException) {
                     exception = compatibleReadException;
                 }
@@ -306,13 +349,24 @@ public class DbStoragePlainFile {
         }
     }
 
-    private <E> E readContent(File originalFile, Kryo kryo) throws FileNotFoundException, KryoException {
+    private <E> E readContent(String key, File originalFile, Kryo kryo) throws FileNotFoundException, KryoException {
         final Input i = new Input(new FileInputStream(originalFile));
         //noinspection TryFinallyCanBeTryWithResources
         try {
             //noinspection unchecked
-            final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
-            return paperTable.mContent;
+            if (mEncryptionEnabled) {
+                final byte[] encryptedObject = kryo.readObject(i, byte[].class);
+                try {
+                    PaperTable<E> paperTable = getKryoCypher().decrypt(key, encryptedObject);
+                    return paperTable.mContent;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    throw new RuntimeException("Could not read encrypted object", ex);
+                }
+            } else {
+                final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
+                return paperTable.mContent;
+            }
         } finally {
             i.close();
         }
