@@ -36,7 +36,7 @@ Paper.init(context);
 * All other APIs (`write`, `read` etc.) are thread-safe and obviously must be called outside of UI thread. Reading/writing for different `key`s can be done in parallel. 
  
 ### Save
-Save any object, Map, List, HashMap etc. including all internal objects. Use your existing data classes as is.
+Save any object, Map, List, HashMap etc. including all internal objects. Use your existing data classes as is. Note that key is used as file name to store the data and so *cannot* contain symbols like `/`.
 
 ```java
 List<Person> contacts = ...
