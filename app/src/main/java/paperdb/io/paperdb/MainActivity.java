@@ -2,6 +2,7 @@ package paperdb.io.paperdb;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final Button btnRead = (Button) findViewById(R.id.test_read);
+        final Button btnRead = findViewById(R.id.test_read);
 
         btnRead.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +51,34 @@ public class MainActivity extends AppCompatActivity {
                 btnRead.setText("Read: " + o1.getValue() + " : " + o2.getValue().get(0));
             }
         });
+
+        final Button btnReadWriteAsync = findViewById(R.id.test_read_write_async);
+        btnReadWriteAsync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                testReadWriteAsync();
+            }
+        });
+    }
+
+    private void testReadWriteAsync() {
+        final int iterations = 10;
+        readWriteKey("key1", iterations);
+        readWriteKey("key2", iterations);
+    }
+
+    private void readWriteKey(final String key, final int iterations) {
+        new Thread() {
+            @Override
+            public void run() {
+                for (int i = 0; i < iterations; i++) {
+                    Paper.book().write(key, "key:" + key + " iteration#" + i);
+                    Log.d("PAPER_APP", "" + Paper.book().<String>read(key));
+                    // This caused the issue on multi-thread paper db dir creation
+                    Paper.book().destroy();
+                }
+            }
+        }.start();
     }
 
     @Override
