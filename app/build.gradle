@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     // Must be the same version as in travis.xml
-    buildToolsVersion "26.0.1"
 
     defaultConfig {
         applicationId "paperdb.io.paperdb"
@@ -22,12 +21,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.1.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
     //compile project(':paperdb')
-    compile 'io.paperdb:paperdb:2.6'
+    implementation 'io.paperdb:paperdb:2.6'
 
-    androidTestCompile('com.android.support.test:runner:0.5') {
+    androidTestImplementation('com.android.support.test:runner:0.5') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 }
