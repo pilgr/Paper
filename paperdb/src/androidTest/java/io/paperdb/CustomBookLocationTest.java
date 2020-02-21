@@ -1,6 +1,6 @@
 package io.paperdb;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import junit.framework.Assert;
 
@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.util.HashSet;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.platform.app.InstrumentationRegistry.getTargetContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;

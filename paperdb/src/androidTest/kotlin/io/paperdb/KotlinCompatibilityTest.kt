@@ -1,7 +1,7 @@
 package io.paperdb
 
-import android.support.test.InstrumentationRegistry.getTargetContext
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getTargetContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
