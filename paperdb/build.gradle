@@ -15,12 +15,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     // Must be the same version as in travis.xml
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
