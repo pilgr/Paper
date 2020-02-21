@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 buildscript {
-    ext.kotlin_version = '1.3.10'
+    ext.kotlin_version = '1.3.61'
     repositories {
         mavenCentral()
     }
@@ -15,18 +15,18 @@ repositories {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     // Must be the same version as in travis.xml
 
     defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 28
+        minSdkVersion 14
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
         consumerProguardFiles 'proguard.txt'
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -61,7 +61,7 @@ dependencies {
     implementation 'de.javakaffee:kryo-serializers:0.40'
 
     androidTestImplementation 'com.orhanobut:hawk:1.14'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'com.squareup.assertj:assertj-android:1.1.0'
     androidTestImplementation 'joda-time:joda-time:2.9.6'
     androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
