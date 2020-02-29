@@ -32,7 +32,7 @@ import io.paperdb.serializer.NoArgCollectionSerializer;
 
 import static io.paperdb.Paper.TAG;
 
-public class DbStoragePlainFile {
+class DbStoragePlainFile {
 
     private final String mDbPath;
     private final HashMap<Class, Serializer> mCustomSerializers;
@@ -98,13 +98,20 @@ public class DbStoragePlainFile {
         mDbPath = dbFilesDir + File.separator + dbName;
     }
 
-    public synchronized void destroy() {
-        assertInit();
+    void destroy() {
+        // Acquire global lock to make sure per-key operations (read, write etc) completed
+        // and block future per-key operations until destroy is completed
+        try {
+            keyLocker.acquireGlobal();
+            assertInit();
 
-        if (!deleteDirectory(mDbPath)) {
-            Log.e(TAG, "Couldn't delete Paper dir " + mDbPath);
+            if (!deleteDirectory(mDbPath)) {
+                Log.e(TAG, "Couldn't delete Paper dir " + mDbPath);
+            }
+            mPaperDirIsCreated = false;
+        } finally {
+            keyLocker.releaseGlobal();
         }
-        mPaperDirIsCreated = false;
     }
 
     <E> void insert(String key, E value) {
@@ -189,19 +196,26 @@ public class DbStoragePlainFile {
         }
     }
 
-    synchronized List<String> getAllKeys() {
-        assertInit();
+    List<String> getAllKeys() {
+        try {
+            // Acquire global lock to make sure per-key operations (delete etc) completed
+            // and block future per-key operations until reading for all keys is completed
+            keyLocker.acquireGlobal();
+            assertInit();
 
-        File bookFolder = new File(mDbPath);
-        String[] names = bookFolder.list();
-        if (names != null) {
-            //remove extensions
-            for (int i = 0; i < names.length; i++) {
-                names[i] = names[i].replace(".pt", "");
+            File bookFolder = new File(mDbPath);
+            String[] names = bookFolder.list();
+            if (names != null) {
+                //remove extensions
+                for (int i = 0; i < names.length; i++) {
+                    names[i] = names[i].replace(".pt", "");
+                }
+                return Arrays.asList(names);
+            } else {
+                return new ArrayList<>();
             }
-            return Arrays.asList(names);
-        } else {
-            return new ArrayList<>();
+        } finally {
+            keyLocker.releaseGlobal();
         }
     }
 
@@ -316,19 +330,18 @@ public class DbStoragePlainFile {
         }
     }
 
-    private void assertInit() {
+    /**
+     * Must be synchronized to avoid race conditions on creating dir from different threads
+     */
+    private synchronized void assertInit() {
         if (!mPaperDirIsCreated) {
-            createPaperDir();
-            mPaperDirIsCreated = true;
-        }
-    }
-
-    private void createPaperDir() {
-        if (!new File(mDbPath).exists()) {
-            boolean isReady = new File(mDbPath).mkdirs();
-            if (!isReady) {
-                throw new RuntimeException("Couldn't create Paper dir: " + mDbPath);
+            if (!new File(mDbPath).exists()) {
+                boolean isReady = new File(mDbPath).mkdirs();
+                if (!isReady) {
+                    throw new RuntimeException("Couldn't create Paper dir: " + mDbPath);
+                }
             }
+            mPaperDirIsCreated = true;
         }
     }
 
