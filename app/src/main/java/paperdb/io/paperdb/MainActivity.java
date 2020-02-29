@@ -62,18 +62,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testReadWriteAsync() {
-        final int iterations = 10;
-        readWriteKey("key1", iterations);
-        readWriteKey("key2", iterations);
+        final int iterations = 1000;
+        writeReadDestroy("key1", iterations);
+        writeReadDestroy("key2", iterations);
     }
 
-    private void readWriteKey(final String key, final int iterations) {
+    private void writeReadDestroy(final String key, final int iterations) {
         new Thread() {
             @Override
             public void run() {
                 for (int i = 0; i < iterations; i++) {
                     Paper.book().write(key, "key:" + key + " iteration#" + i);
-                    Log.d("PAPER_APP", "" + Paper.book().<String>read(key));
+                    Log.d("PAPER_APP", "read key:" + key + "=" + Paper.book().<String>read(key));
                     // This caused the issue on multi-thread paper db dir creation
                     Paper.book().destroy();
                 }

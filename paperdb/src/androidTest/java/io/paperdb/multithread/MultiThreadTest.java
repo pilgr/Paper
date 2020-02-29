@@ -127,9 +127,10 @@ public class MultiThreadTest {
         ExecutorService executor = Executors.newFixedThreadPool(2);
         List<Callable<Object>> tasks = new LinkedList<>();
 
-        tasks.add(Executors.callable(readWriteDestroy("multi_thread_key_1", 100)));
-        tasks.add(Executors.callable(readWriteDestroy("multi_thread_key_2", 100)));
+        tasks.add(Executors.callable(writeReadDestroy("multi_thread_key_1", 200)));
+        tasks.add(Executors.callable(writeReadDestroy("multi_thread_key_2", 200)));
 
+        // Make sure no crash produced
         List<Future<Object>> futures = executor.invokeAll(tasks);
         for (Future<Object> future : futures) {
             future.get();
@@ -179,12 +180,14 @@ public class MultiThreadTest {
         };
     }
 
-    private Runnable readWriteDestroy(final String key, final int iterations) {
+    private Runnable writeReadDestroy(final String key, final int iterations) {
         return new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < iterations; i++) {
+                    Paper.book().getAllKeys();
                     Paper.book().write(key, "key:" + key + " iteration#" + i);
+                    Paper.book().read(key);
                     Paper.book().destroy();
                 }
             }
