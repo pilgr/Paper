@@ -17,7 +17,7 @@ import java.util.Map;
 import io.paperdb.testdata.Person;
 import io.paperdb.testdata.PersonArg;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static io.paperdb.testdata.TestDataGenerator.genPerson;
 import static io.paperdb.testdata.TestDataGenerator.genPersonList;
 import static io.paperdb.testdata.TestDataGenerator.genPersonMap;

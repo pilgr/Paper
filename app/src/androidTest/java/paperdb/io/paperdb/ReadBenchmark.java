@@ -17,7 +17,7 @@ import io.paperdb.Paper;
 import paperdb.io.paperdb.testdata.Person;
 import paperdb.io.paperdb.testdata.TestDataGenerator;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)

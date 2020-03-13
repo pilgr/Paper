@@ -1,14 +1,15 @@
-package io.paperdb
+package io.paperdb.io.paperdb
 
-import androidx.test.platform.app.InstrumentationRegistry.getTargetContext
+import androidx.test.InstrumentationRegistry.getTargetContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.paperdb.Paper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class KotlinCompatibilityTest {
+class KotlinCompatibilityTest{
 
     @Before
     @Throws(Exception::class)

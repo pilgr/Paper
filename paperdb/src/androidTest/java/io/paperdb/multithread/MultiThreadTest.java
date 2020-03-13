@@ -23,7 +23,7 @@ import io.paperdb.Paper;
 import io.paperdb.testdata.Person;
 import io.paperdb.testdata.TestDataGenerator;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

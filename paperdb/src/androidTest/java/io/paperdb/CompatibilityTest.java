@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 
 import java.lang.reflect.Field;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
