@@ -16,7 +16,7 @@ import de.javakaffee.kryoserializers.jodatime.JodaDateTimeSerializer;
 import io.paperdb.testdata.TestDataGenerator;
 import io.paperdb.utils.TestUtils;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
