@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 
 public class TestUtils {
 
