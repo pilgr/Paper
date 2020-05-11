@@ -16,10 +16,8 @@ class KeyLocker {
     private Semaphore global = new Semaphore(1, true);
 
     void acquire(String key) {
-        int availablePermits = global.availablePermits();
-
         // If global semaphore is acquired, wait until global operation is done
-        if (availablePermits == 0) {
+        if (global.availablePermits() == 0) {
             global.acquireUninterruptibly();
             global.release();
         }
