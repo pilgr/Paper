@@ -105,7 +105,6 @@ class DbStoragePlainFile {
         // and block future per-key operations until destroy is completed
         try {
             keyLocker.acquireGlobal();
-            assertInit();
 
             if (!deleteDirectory(mDbPath)) {
                 Log.e(TAG, "Couldn't delete Paper dir " + mDbPath);
