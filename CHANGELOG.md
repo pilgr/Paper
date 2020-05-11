@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+Version 2.7 *(2020-05-11)*
+----------------------------
+
+Fixes:
+* Ignore backup files in getAllKeys
+* Fix nasty issue when write and destroy is being called in parallel
+
+Thanks Alexandre Boucey, Mohamed Wael and other contributors to make this happen!
+
+
 Version 2.6 *(2017-10-21)*
 ----------------------------
 
