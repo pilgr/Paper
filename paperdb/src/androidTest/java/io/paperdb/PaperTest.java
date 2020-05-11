@@ -1,7 +1,7 @@
 package io.paperdb;
 
 import android.os.SystemClock;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -16,7 +16,7 @@ import de.javakaffee.kryoserializers.jodatime.JodaDateTimeSerializer;
 import io.paperdb.testdata.TestDataGenerator;
 import io.paperdb.utils.TestUtils;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;

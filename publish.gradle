@@ -2,7 +2,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
 // This is the library version used when deploying the artifact
-version = "2.6"
+version = "2.7.1"
 
 def siteUrl = 'https://github.com/pilgr/Paper'      // Homepage URL of the library
 def gitUrl = 'https://github.com/pilgr/Paper.git'   // Git repository URL

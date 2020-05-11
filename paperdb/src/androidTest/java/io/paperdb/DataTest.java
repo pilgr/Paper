@@ -1,6 +1,6 @@
 package io.paperdb;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import java.util.Map;
 import io.paperdb.testdata.Person;
 import io.paperdb.testdata.PersonArg;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static io.paperdb.testdata.TestDataGenerator.genPerson;
 import static io.paperdb.testdata.TestDataGenerator.genPersonList;
 import static io.paperdb.testdata.TestDataGenerator.genPersonMap;

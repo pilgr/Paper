@@ -1,18 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 29
     // Must be the same version as in travis.xml
-    buildToolsVersion "26.0.1"
 
     defaultConfig {
         applicationId "paperdb.io.paperdb"
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -22,12 +21,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    //compile project(':paperdb')
-    compile 'io.paperdb:paperdb:2.6'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+//    implementation project(':paperdb')
+    implementation 'io.paperdb:paperdb:2.7.1'
 
-    androidTestCompile('com.android.support.test:runner:0.5') {
+    androidTestImplementation('androidx.test.ext:junit:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 }

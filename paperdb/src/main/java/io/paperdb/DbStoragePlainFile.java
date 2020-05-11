@@ -33,7 +33,7 @@ import io.paperdb.serializer.NoArgCollectionSerializer;
 
 import static io.paperdb.Paper.TAG;
 
-public class DbStoragePlainFile {
+class DbStoragePlainFile {
     private static final String BACKUP_EXTENSION = ".bak";
 
     private final String mDbPath;
@@ -100,13 +100,19 @@ public class DbStoragePlainFile {
         mDbPath = dbFilesDir + File.separator + dbName;
     }
 
-    public synchronized void destroy() {
-        assertInit();
+    void destroy() {
+        // Acquire global lock to make sure per-key operations (read, write etc) completed
+        // and block future per-key operations until destroy is completed
+        try {
+            keyLocker.acquireGlobal();
 
-        if (!deleteDirectory(mDbPath)) {
-            Log.e(TAG, "Couldn't delete Paper dir " + mDbPath);
+            if (!deleteDirectory(mDbPath)) {
+                Log.e(TAG, "Couldn't delete Paper dir " + mDbPath);
+            }
+            mPaperDirIsCreated = false;
+        } finally {
+            keyLocker.releaseGlobal();
         }
-        mPaperDirIsCreated = false;
     }
 
     <E> void insert(String key, E value) {
@@ -191,24 +197,31 @@ public class DbStoragePlainFile {
         }
     }
 
-    synchronized List<String> getAllKeys() {
-        assertInit();
+    List<String> getAllKeys() {
+        try {
+            // Acquire global lock to make sure per-key operations (delete etc) completed
+            // and block future per-key operations until reading for all keys is completed
+            keyLocker.acquireGlobal();
+            assertInit();
 
-        File bookFolder = new File(mDbPath);
-        String[] names = bookFolder.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File file, String s) {
-                return !s.endsWith(BACKUP_EXTENSION);
+            File bookFolder = new File(mDbPath);
+            String[] names = bookFolder.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File file, String s) {
+                    return !s.endsWith(BACKUP_EXTENSION);
+                }
+            });
+            if (names != null) {
+                //remove extensions
+                for (int i = 0; i < names.length; i++) {
+                    names[i] = names[i].replace(".pt", "");
+                }
+                return Arrays.asList(names);
+            } else {
+                return new ArrayList<>();
             }
-        });
-        if (names != null) {
-            //remove extensions
-            for (int i = 0; i < names.length; i++) {
-                names[i] = names[i].replace(".pt", "");
-            }
-            return Arrays.asList(names);
-        } else {
-            return new ArrayList<>();
+        } finally {
+            keyLocker.releaseGlobal();
         }
     }
 
@@ -261,15 +274,16 @@ public class DbStoragePlainFile {
      */
     private <E> void writeTableFile(String key, PaperTable<E> paperTable,
                                     File originalFile, File backupFile) {
+        Output kryoOutput = null;
         try {
             FileOutputStream fileStream = new FileOutputStream(originalFile);
-
-            final Output kryoOutput = new Output(fileStream);
+            kryoOutput = new Output(fileStream);
             getKryo().writeObject(kryoOutput, paperTable);
             kryoOutput.flush();
             fileStream.flush();
             sync(fileStream);
             kryoOutput.close(); //also close file stream
+            kryoOutput = null;
 
             // Writing was successful, delete the backup file if there is one.
             //noinspection ResultOfMethodCallIgnored
@@ -284,6 +298,10 @@ public class DbStoragePlainFile {
             }
             throw new PaperDbException("Couldn't save table: " + key + ". " +
                     "Backed up table will be used on next read attempt", e);
+        } finally {
+            if (kryoOutput != null) {
+                kryoOutput.close();  // closing opened kryo output with initial file stream.
+            }
         }
     }
 
@@ -318,19 +336,18 @@ public class DbStoragePlainFile {
         }
     }
 
-    private void assertInit() {
+    /**
+     * Must be synchronized to avoid race conditions on creating dir from different threads
+     */
+    private synchronized void assertInit() {
         if (!mPaperDirIsCreated) {
-            createPaperDir();
-            mPaperDirIsCreated = true;
-        }
-    }
-
-    private void createPaperDir() {
-        if (!new File(mDbPath).exists()) {
-            boolean isReady = new File(mDbPath).mkdirs();
-            if (!isReady) {
-                throw new RuntimeException("Couldn't create Paper dir: " + mDbPath);
+            if (!new File(mDbPath).exists()) {
+                boolean isReady = new File(mDbPath).mkdirs();
+                if (!isReady) {
+                    throw new RuntimeException("Couldn't create Paper dir: " + mDbPath);
+                }
             }
+            mPaperDirIsCreated = true;
         }
     }
 

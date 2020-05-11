@@ -5,21 +5,17 @@ Paper's aim is to provide a simple yet [fast](#benchmark-results) object storage
 
 ![Paper icon](/paper_icon.png)
 
-#### What's [new](/CHANGELOG.md) in 2.6
+#### What's [new](/CHANGELOG.md) in 2.7.1
 
-New API:
-* `Paper.bookOn(path)` to set custom storage location;
-* `book.getPath()` or `book.getPath(key)` to get path for content of book or key.
-    
-Improvements:
-* simultaneous read/write for different keys, up to 97% performance gain per thread.
-* name change: use `book.contains(key)` instead of deprecated `book.exist(key)`
-    
-Thanks [@hiperioncn](https://github.com/hiperioncn) and [@cezar-carneiro](https://github.com/cezar-carneiro) for your contribution!
+Fixes:
+* Ignore backup files in getAllKeys
+* Fix exception on simultaneous write and destroy
+
+Thanks Alexandre Boucey, Mohamed Wael and other contributors to make this happen!
 
 ### Add dependency
 ```groovy
-implementation 'io.paperdb:paperdb:2.6'
+implementation 'io.paperdb:paperdb:2.7.1'
 ```
 
 RxJava wrapper for Paper is available as a separate lib [RxPaper2](https://github.com/pakoito/RxPaper2). Thanks [@pakoito](https://github.com/pakoito) for it!

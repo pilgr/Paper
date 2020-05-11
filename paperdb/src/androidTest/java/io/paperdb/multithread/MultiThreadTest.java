@@ -1,7 +1,7 @@
 package io.paperdb.multithread;
 
-import android.support.annotation.NonNull;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.annotation.NonNull;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import android.util.Log;
 
 import org.junit.Before;
@@ -23,7 +23,7 @@ import io.paperdb.Paper;
 import io.paperdb.testdata.Person;
 import io.paperdb.testdata.TestDataGenerator;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -115,6 +115,28 @@ public class MultiThreadTest {
         }
     }
 
+    /**
+     * Reproduces the issues
+     * https://github.com/pilgr/Paper/issues/66
+     * https://github.com/pilgr/Paper/issues/108
+     * https://github.com/pilgr/Paper/issues/114
+     * https://github.com/pilgr/Paper/issues/159
+     */
+    @Test
+    public void testWriteReadDestroyMultiThread() throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        List<Callable<Object>> tasks = new LinkedList<>();
+
+        tasks.add(Executors.callable(writeReadDestroy("multi_thread_key_1", 200)));
+        tasks.add(Executors.callable(writeReadDestroy("multi_thread_key_2", 200)));
+
+        // Make sure no crash produced
+        List<Future<Object>> futures = executor.invokeAll(tasks);
+        for (Future<Object> future : futures) {
+            future.get();
+        }
+    }
+
     @NonNull
     private CountDownLatch startWritingLargeDataSetInSeparateThread(
             @SuppressWarnings("SameParameterValue") final String key) throws InterruptedException {
@@ -154,6 +176,20 @@ public class MultiThreadTest {
             @Override
             public void run() {
                 Paper.book().read("persons");
+            }
+        };
+    }
+
+    private Runnable writeReadDestroy(final String key, final int iterations) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < iterations; i++) {
+                    Paper.book().getAllKeys();
+                    Paper.book().write(key, "key:" + key + " iteration#" + i);
+                    Paper.book().read(key);
+                    Paper.book().destroy();
+                }
             }
         };
     }

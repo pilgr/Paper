@@ -1,9 +1,10 @@
 package io.paperdb.benchmark;
 
 import android.os.SystemClock;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.util.Log;
 
 import com.orhanobut.hawk.Hawk;
@@ -18,7 +19,7 @@ import io.paperdb.testdata.Person;
 import io.paperdb.testdata.PersonArg;
 import io.paperdb.testdata.TestDataGenerator;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
