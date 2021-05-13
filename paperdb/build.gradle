@@ -14,6 +14,14 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    PUBLISH_GROUP_ID = 'io.github.pilgr'
+    PUBLISH_VERSION = '2.7.1'
+    PUBLISH_ARTIFACT_ID = 'paperdb'
+}
+
+apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
+
 android {
     compileSdkVersion 29
     // Must be the same version as in travis.xml
@@ -70,5 +78,3 @@ dependencies {
     androidTestImplementation 'joda-time:joda-time:2.9.6'
     androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
-
-apply from: '../publish.gradle'
