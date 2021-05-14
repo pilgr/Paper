@@ -5,9 +5,9 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools-26.0.1
+    - build-tools-29.0.2
     - android-22
-    - android-26
+    - android-29
     - extra-android-m2repository
 
     # Specify at least one system image,
