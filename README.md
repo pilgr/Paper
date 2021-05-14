@@ -5,17 +5,13 @@ Paper's aim is to provide a simple yet [fast](#benchmark-results) object storage
 
 ![Paper icon](/paper_icon.png)
 
-#### What's [new](/CHANGELOG.md) in 2.7.1
-
-Fixes:
-* Ignore backup files in getAllKeys
-* Fix exception on simultaneous write and destroy
-
-Thanks Alexandre Boucey, Mohamed Wael and other contributors to make this happen!
+### Migration to Maven Central
+**Library has been moved to Maven Central since service ends for JCenter. Note that group id
+has been changed to `io.github.pilgr`. See the updated section below.**  
 
 ### Add dependency
 ```groovy
-implementation 'io.paperdb:paperdb:2.7.1'
+implementation 'io.github.pilgr:paperdb:2.7.1'
 ```
 
 RxJava wrapper for Paper is available as a separate lib [RxPaper2](https://github.com/pakoito/RxPaper2). Thanks [@pakoito](https://github.com/pakoito) for it!
