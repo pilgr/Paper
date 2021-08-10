@@ -5,6 +5,9 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.esotericsoftware.kryo.Serializer;
 
 import java.io.File;
@@ -43,7 +46,7 @@ public class Paper {
      *
      * @param context context, used to get application context
      */
-    public static void init(Context context) {
+    public static void init(@NonNull Context context) {
         mContext = context.getApplicationContext();
     }
 
@@ -53,7 +56,7 @@ public class Paper {
      * @param name name of new database
      * @return Paper instance
      */
-    public static Book book(String name) {
+    public static @NonNull Book book(@NonNull String name) {
         if (name.equals(DEFAULT_DB_NAME)) throw new PaperDbException(DEFAULT_DB_NAME +
                 " name is reserved for default library name");
         return getBook(null, name);
@@ -64,7 +67,7 @@ public class Paper {
      *
      * @return Book instance
      */
-    public static Book book() {
+    public static @NonNull Book book() {
         return getBook(null, DEFAULT_DB_NAME);
     }
 
@@ -75,7 +78,7 @@ public class Paper {
      * @param name     the name of the book
      * @return book instance
      */
-    public static Book bookOn(String location, String name) {
+    public static @NonNull Book bookOn(@NonNull String location, @NonNull String name) {
         location = removeLastFileSeparatorIfExists(location);
         return getBook(location, name);
     }
@@ -86,7 +89,7 @@ public class Paper {
      * @param location the path to a folder where the book's folder will be placed
      * @return book instance
      */
-    public static Book bookOn(String location) {
+    public static @NonNull Book bookOn(@NonNull String location) {
         return bookOn(location, DEFAULT_DB_NAME);
     }
 
@@ -119,35 +122,35 @@ public class Paper {
     /**
      * @deprecated use Paper.book().write()
      */
-    public static <T> Book put(String key, T value) {
+    public static @NonNull <T> Book put(@NonNull String key, @NonNull T value) {
         return book().write(key, value);
     }
 
     /**
      * @deprecated use Paper.book().read()
      */
-    public static <T> T get(String key) {
+    public static @Nullable <T> T get(@NonNull String key) {
         return book().read(key);
     }
 
     /**
      * @deprecated use Paper.book().read()
      */
-    public static <T> T get(String key, T defaultValue) {
+    public static @Nullable <T> T get(@NonNull String key, @Nullable T defaultValue) {
         return book().read(key, defaultValue);
     }
 
     /**
      * @deprecated use Paper.book().contains()
      */
-    public static boolean exist(String key) {
+    public static boolean exist(@NonNull String key) {
         return book().contains(key);
     }
 
     /**
      * @deprecated use Paper.book().delete()
      */
-    public static void delete(String key) {
+    public static void delete(@NonNull String key) {
         book().delete(key);
     }
 
@@ -155,7 +158,7 @@ public class Paper {
      * @deprecated use Paper.book().destroy(). NOTE: Paper.init() be called
      * before destroy()
      */
-    public static void clear(Context context) {
+    public static void clear(@NonNull Context context) {
         init(context);
         book().destroy();
     }
@@ -179,7 +182,7 @@ public class Paper {
      * @param serializer the serializer instance
      * @param <T>        type of the serializer
      */
-    public static <T> void addSerializer(Class<T> clazz, Serializer<T> serializer) {
+    public static <T> void addSerializer(@NonNull Class<T> clazz, @NonNull Serializer<T> serializer) {
         if (!mCustomSerializers.containsKey(clazz))
             mCustomSerializers.put(clazz, serializer);
     }
