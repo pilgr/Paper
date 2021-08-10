@@ -2,6 +2,9 @@ package io.paperdb;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.esotericsoftware.kryo.Serializer;
 
 import java.util.HashMap;
@@ -35,7 +38,7 @@ public class Book {
      * @param <T>   object type
      * @return this Book instance
      */
-    public <T> Book write(String key, T value) {
+    public @NonNull <T> Book write(@NonNull String key, @NonNull T value) {
         if (value == null) {
             throw new PaperDbException("Paper doesn't support writing null root values");
         } else {
@@ -54,7 +57,7 @@ public class Book {
      * @param key object key to read
      * @return the saved object instance or null
      */
-    public <T> T read(String key) {
+    public @Nullable <T> T read(@NonNull String key) {
         return read(key, null);
     }
 
@@ -69,7 +72,7 @@ public class Book {
      * @param defaultValue will be returned if key doesn't exist
      * @return the saved object instance or null
      */
-    public <T> T read(String key, T defaultValue) {
+    public @Nullable <T> T read(@NonNull String key, @Nullable T defaultValue) {
         T value = mStorage.select(key);
         return value == null ? defaultValue : value;
     }
@@ -80,7 +83,7 @@ public class Book {
      * @param key object key
      * @return true if Book storage contains an object with given key, false otherwise
      */
-    public boolean contains(String key) {
+    public boolean contains(@NonNull String key) {
         return mStorage.exists(key);
     }
 
@@ -91,7 +94,7 @@ public class Book {
      * @return true if object with given key exists in Book storage, false otherwise
      * @deprecated As of release 2.6, replaced by {@link #contains(String)}}
      */
-    public boolean exist(String key) {
+    public boolean exist(@NonNull String key) {
         return mStorage.exists(key);
     }
 
@@ -103,7 +106,7 @@ public class Book {
      * @param key object key
      * @return timestamp of last write for given key in ms if it exists, otherwise -1
      */
-    public long lastModified(String key) {
+    public long lastModified(@NonNull String key) {
         return mStorage.lastModified(key);
     }
 
@@ -112,7 +115,7 @@ public class Book {
      *
      * @param key object key
      */
-    public void delete(String key) {
+    public void delete(@NonNull String key) {
         mStorage.deleteIfExists(key);
     }
 
@@ -121,7 +124,7 @@ public class Book {
      *
      * @return all keys
      */
-    public List<String> getAllKeys() {
+    public @NonNull List<String> getAllKeys() {
         return mStorage.getAllKeys();
     }
 
@@ -144,7 +147,7 @@ public class Book {
      *
      * @return path to a folder locating data files for the current Book
      */
-    public String getPath() {
+    public @NonNull String getPath() {
         return mStorage.getRootFolderPath();
     }
 
@@ -159,7 +162,7 @@ public class Book {
      * @param key object key
      * @return path to a *.pt file containing saved object for a given key.
      */
-    public String getPath(String key) {
+    public @NonNull String getPath(@NonNull String key) {
         return mStorage.getOriginalFilePath(key);
     }
 }
