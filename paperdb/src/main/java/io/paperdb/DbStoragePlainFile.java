@@ -9,6 +9,7 @@ import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
+import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
@@ -48,16 +49,13 @@ class DbStoragePlainFile {
     private final ThreadLocal<Kryo> mKryo = new ThreadLocal<Kryo>() {
         @Override
         protected Kryo initialValue() {
-            return createKryoInstance(false);
+            return createKryoInstance();
         }
     };
 
-    private Kryo createKryoInstance(boolean compatibilityMode) {
+    private Kryo createKryoInstance() {
         Kryo kryo = new Kryo();
-
-        if (compatibilityMode) {
-            kryo.getFieldSerializerConfig().setOptimizedGenerics(true);
-        }
+        kryo.setRegistrationRequired(false);
 
         kryo.register(PaperTable.class);
         kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
@@ -83,7 +81,7 @@ class DbStoragePlainFile {
             kryo.register(clazz, mCustomSerializers.get(clazz));
 
         kryo.setInstantiatorStrategy(
-                new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+                new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
 
         return kryo;
     }
@@ -309,18 +307,9 @@ class DbStoragePlainFile {
         try {
             return readContent(originalFile, getKryo());
         } catch (FileNotFoundException | KryoException | ClassCastException e) {
-            Throwable exception = e;
-            // Give one more chance, read data in paper 1.x compatibility mode
-            if (e instanceof KryoException) {
-                try {
-                    return readContent(originalFile, createKryoInstance(true));
-                } catch (FileNotFoundException | KryoException | ClassCastException compatibleReadException) {
-                    exception = compatibleReadException;
-                }
-            }
             String errorMessage = "Couldn't read/deserialize file "
                     + originalFile + " for table " + key;
-            throw new PaperDbException(errorMessage, exception);
+            throw new PaperDbException(errorMessage, e);
         }
     }
 

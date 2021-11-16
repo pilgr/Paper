@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 public class NoArgCollectionSerializer extends CollectionSerializer {
     @Override
-    protected Collection create(Kryo kryo, Input input, Class<Collection> type) {
+    protected Collection create(Kryo kryo, Input input, Class type, int size) {
         return new ArrayList();
     }
 }
