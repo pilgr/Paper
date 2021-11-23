@@ -16,7 +16,7 @@ repositories {
 
 ext {
     PUBLISH_GROUP_ID = 'io.github.pilgr'
-    PUBLISH_VERSION = '2.7.1'
+    PUBLISH_VERSION = '2.7.2'
     PUBLISH_ARTIFACT_ID = 'paperdb'
 }
 
