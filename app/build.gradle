@@ -17,6 +17,12 @@ android {
         release {
             minifyEnabled false
         }
+
+        debug {
+            minifyEnabled true
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+        }
     }
 }
 
