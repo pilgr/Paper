@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
 ./gradlew clean :paperdb:publishReleasePublicationToSonatypeRepository
+
+# * Login to https://s01.oss.sonatype.org/#welcome
+# * Navigate to Staging Repositories
+# * Close staging repo
+# * WAIT, refresh and then Release
