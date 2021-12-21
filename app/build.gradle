@@ -30,7 +30,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
 //    implementation project(':paperdb')
-    implementation 'io.github.pilgr:paperdb:2.7.1'
+    implementation 'io.github.pilgr:paperdb:2.7.2'
 
     androidTestImplementation('androidx.test.ext:junit:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
