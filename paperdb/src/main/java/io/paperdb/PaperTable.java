@@ -1,6 +1,6 @@
 package io.paperdb;
 
-class PaperTable<T> {
+public class PaperTable<T> {
 
     @SuppressWarnings("UnusedDeclaration") PaperTable() {
     }
