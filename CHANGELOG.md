@@ -1,6 +1,17 @@
 Change Log
 ==========
 
+Version 2.7.2 *(2020-12-23)*
+----------------------------
+
+Fixes:
+* Crash on read caused by R8 optimization
+
+Improvements:
+* Add nullability annotations
+
+Thanks Keita Watanabe, Nabil Mosharraf, Ahmet Türk
+
 Version 2.7.1 *(2020-05-11)*
 ----------------------------
 

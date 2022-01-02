@@ -11,7 +11,7 @@ has been changed to `io.github.pilgr`. See the updated section below.**
 
 ### Add dependency
 ```groovy
-implementation 'io.github.pilgr:paperdb:2.7.1'
+implementation 'io.github.pilgr:paperdb:2.7.2'
 ```
 
 RxJava wrapper for Paper is available as a separate lib [RxPaper2](https://github.com/pakoito/RxPaper2). Thanks [@pakoito](https://github.com/pakoito) for it!
