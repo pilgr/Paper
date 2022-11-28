@@ -54,7 +54,7 @@ class DbStoragePlainFile {
 
     private Kryo createKryoInstance(boolean compatibilityMode) {
         Kryo kryo = new Kryo();
-
+        kryo.setRegistrationRequired(true);
         if (compatibilityMode) {
             kryo.getFieldSerializerConfig().setOptimizedGenerics(true);
         }
