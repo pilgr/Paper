@@ -135,7 +135,15 @@ also you can implement _Serializable_ for all your data classes and keep all of 
 ```
 -keep class * implements java.io.Serializable { *; }
 ```
+* If your data models use enums, you should also keep them:
 
+```
+-keep enum your.app.data.model.** { *; }
+```
+* And if you rely on Kotlin's `emptyList()`/`emptyMap()`/`emptySet` to assign values to your data models, it is relevant to keep `EmptyList`/`EmptyMap`/`EmptySet` as well:
+```
+-keep class kotlin.collections.* { *; }
+```
 ### How it works
 Paper is based on the following assumptions:
 - Datasets on mobile devices are small and usually don't have relations in between; 
