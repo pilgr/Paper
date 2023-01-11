@@ -51,6 +51,17 @@ public class Paper {
     }
 
     /**
+     * Alternative to {@link #init(Context)} when {@link #book()} method is not needed.
+     *
+     * <p><b><font color="red">
+     *    Do not use this constructor unless you are explicitely specifying location by using {@link #bookOn(String)}
+     *    or {@link #bookOn(String, String)}.
+     * </font>
+     */
+    public static void init() {
+    }
+
+    /**
      * Returns book instance with the given name
      *
      * @param name name of new database
@@ -94,8 +105,9 @@ public class Paper {
     }
 
     private static Book getBook(String location, String name) {
-        if (mContext == null) {
-            throw new PaperDbException("Paper.init is not called");
+        if (location == null && mContext == null) {
+            throw new PaperDbException("Paper.init(Context) is not called. If you are calling Paper.init(), " +
+                    "please call Paper.init(Context) instead.");
         }
         String key = (location == null ? "" : location) + name;
         synchronized (mBookMap) {
